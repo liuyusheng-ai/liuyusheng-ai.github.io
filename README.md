@@ -1,11 +1,18 @@
 # Eason 刘雨生 · Personal Website
 
-AI Agent / 大模型应用开发个人作品集。
+个人网站：https://liuyusheng-ai.github.io/
 
-此目录可直接部署至 GitHub Pages，无需构建工具或依赖安装。文件需放在仓库根目录；在仓库 Settings → Pages 中选择 Deploy from a branch、main 分支和 /(root) 目录。
+AI Agent / 大模型应用开发作品集。静态 HTML、CSS 与原生 JavaScript，无需安装依赖。
 
-如创建 `liuyusheng-ai.github.io` 仓库，部署后的主站地址为 https://liuyusheng-ai.github.io/ 。该地址在 GitHub Pages 部署完成前不会生效。
+## 互动体验
 
-页面内容来自用户简历。网站包含业务联系邮箱、电话和可下载的原始简历。独立域名需先拥有域名，再在 Pages 的 Custom domain 与域名 DNS 中配置，不要提前添加未拥有的 CNAME。
+- Agent Playground：行业研究、只读 SQL、安全边界三种预设任务。
+- 支持自动运行、暂停、逐步执行和重置，切换场景会取消正在运行的演示。
+- 正常、证据不足、工具不可用三种条件；输出明确标记为本地演示，无模型调用、数据库连接或用户输入采集。
+- 按知识检索、多智能体、数据分析筛选作品。
+- 粒子作品可暂停；滚动出现动效尊重系统减少动态效果设置。
+- 选择联系主题可预填邮件标题，不自动发送邮件。
 
-参考设计：https://www.awwwards.com/inspiration/scroll-portfolio 。网站与粒子视觉独立实现。系统流程为说明性互动，不连接实际大模型服务。
+GitHub Pages 从 main 分支根目录发布。保留 .nojekyll。网站包含经用户确认可公开的联系方式与完整简历下载。
+
+设计参考：https://www.awwwards.com/inspiration/scroll-portfolio 。页面与粒子视觉独立实现。
