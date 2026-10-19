@@ -9,10 +9,43 @@ let stops=[],active=-1,layoutFrame=0,scrollFrame=0,pageProgress=0;
 function measure(){layoutFrame=0;stops=sections.map(section=>section.getBoundingClientRect().top+scrollY);updateReading()}
 function requestMeasure(){if(!layoutFrame)layoutFrame=requestAnimationFrame(measure)}
 function updateReading(){scrollFrame=0;const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);pageProgress=Math.max(0,Math.min(1,scrollY/max));const focusLine=scrollY+header.offsetHeight+innerHeight*.22;let next=0;stops.forEach((position,index)=>{if(position<=focusLine)next=index});if(scrollY>=max-3)next=sections.length-1;if(next!==active){active=next;links.forEach((a,i)=>{if(i===active)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current')});document.getElementById('chapter-current').textContent=String(active+1).padStart(2,'0')+' / '+names[active];const rect=links[active].getBoundingClientRect(),navRect=nav.getBoundingClientRect();if(nav.scrollWidth>nav.clientWidth)nav.scrollTo({left:nav.scrollLeft+rect.left-navRect.left-nav.clientWidth/2+rect.width/2,behavior:reduceMotion.matches?'instant':'smooth'});root.style.setProperty('--scene-wash',palettes[active].wash);root.style.setProperty('--scene-ink',palettes[active].ink.join(','))}
- document.getElementById('reading-progress').textContent='READING '+String(Math.round(pageProgress*100)).padStart(2,'0')+'%';root.style.setProperty('--scene-progress',pageProgress.toFixed(4));header.classList.toggle('is-scrolled',scrollY>12);backTop.hidden=scrollY<Math.min(420,innerHeight*.55)&&document.activeElement!==backTop;targetProgress=pageProgress;queueScene()}
+ document.getElementById('reading-progress').textContent='READING '+String(Math.round(pageProgress*100)).padStart(2,'0')+'%';root.style.setProperty('--scene-progress',pageProgress.toFixed(4));header.classList.toggle('is-scrolled',scrollY>12);updateEditorialMotion();backTop.hidden=scrollY<Math.min(420,innerHeight*.55)&&document.activeElement!==backTop;targetProgress=pageProgress;queueScene()}
 function requestReading(){if(!scrollFrame)scrollFrame=requestAnimationFrame(updateReading)}
 backTop.addEventListener('click',event=>{event.preventDefault();sections[0].tabIndex=-1;sections[0].focus({preventScroll:true});window.scrollTo({top:0,behavior:reduceMotion.matches?'instant':'smooth'})});
 window.addEventListener('scroll',requestReading,{passive:true});window.addEventListener('resize',()=>{resizeScene();requestMeasure()});window.addEventListener('load',requestMeasure);document.fonts?.ready.then(requestMeasure);new ResizeObserver(requestMeasure).observe(document.body);
+// Keep native scrolling; map the same scroll position into each visual layer.
+const heroLines=[document.querySelector('.people-line'),document.querySelector('.agent-line')];
+const monogram=document.querySelector('.ambient-monogram');
+const workSection=document.getElementById('work');
+const projectCards=[...workSection.querySelectorAll('[data-project]')];
+const viewButtons=[...document.querySelectorAll('[data-work-view]')];
+viewButtons.forEach(button=>button.addEventListener('click',()=>{
+ const view=button.dataset.workView;
+ workSection.dataset.workView=view;
+ viewButtons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+ requestMeasure();
+}));
+function updateEditorialMotion(){
+ const desktop=innerWidth>800&&!reduceMotion.matches;
+ const heroProgress=Math.max(0,Math.min(1,scrollY/Math.max(1,sections[0].offsetHeight)));
+ heroLines.forEach((line,index)=>{
+  if(line)line.style.transform=desktop?'translate3d('+((index?-.045:.06)*innerWidth*heroProgress).toFixed(1)+'px,'+(heroProgress*-30).toFixed(1)+'px,0)':'none';
+ });
+ // The E is an original outline: it draws, opens into the work chapter, then recedes.
+ const entry=(scrollY+innerHeight*.65-(stops[1]||0))/Math.max(1,(stops[2]||innerHeight)-(stops[1]||0));
+ const phase=Math.max(0,Math.min(1.65,entry));
+ if(monogram){
+  monogram.style.strokeDashoffset=String(1750*(1-Math.min(1,phase*1.7)));
+  monogram.style.transform=reduceMotion.matches?'none':'translate3d(0,'+(-phase*10)+'vh,0) scale('+(1+Math.max(0,phase-.5)*2.5)+') rotate('+(-phase*9)+'deg)';
+  monogram.style.opacity=String(Math.max(0,.8-Math.max(0,phase-.85)));
+ }
+ projectCards.forEach((card,index)=>{
+  const rect=card.getBoundingClientRect();
+  const relative=Math.max(-1,Math.min(1,(rect.top+rect.height/2-innerHeight/2)/innerHeight));
+  const shift=desktop&&workSection.dataset.workView!=='index'?relative*(index%2?-13:13):0;
+  card.style.setProperty('--project-shift',shift.toFixed(1)+'px');
+ });
+}
 const briefs={knowledge:{title:'先对齐问题，再选择技术。',questions:['谁会使用这些资料？最常问什么？','资料是否完整、更新、可以追溯？','什么情况必须停止回答或交给人？'],route:'对应实践：养殖场 RAG & Agent → 资料治理、检索、工具与输出护栏。',project:0},research:{title:'把“做份调研”拆成可确认的任务。',questions:['这份报告要帮助谁，做什么决定？','允许使用哪些来源？什么算有效证据？','范围、交付结构和调用预算如何约定？'],route:'对应实践：多角色行业研究 Agent → 规划、证据检索、引用报告与断点恢复。',project:1},data:{title:'先把业务口径与数据权限说清。',questions:['你问的指标，统计口径和时间范围是什么？','哪些表与字段可以使用？结果如何解释？','是否限定只读、最大行数与修复次数？'],route:'对应实践：Text-to-SQL Agent → 意图路由、Schema 检索、只读校验与结果解释。',project:2}};
 let briefProject=0;document.querySelectorAll('[data-brief]').forEach(button=>button.addEventListener('click',()=>{const entry=briefs[button.dataset.brief];briefProject=entry.project;document.querySelectorAll('[data-brief]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));document.getElementById('brief-title').textContent=entry.title;const list=document.getElementById('brief-questions');list.replaceChildren(...entry.questions.map(copy=>{const li=document.createElement('li');li.textContent=copy;return li}));document.getElementById('brief-route').textContent=entry.route}));document.getElementById('brief-project').addEventListener('click',()=>{document.querySelector('[data-filter="all"]').click();document.querySelector('[data-project="'+briefProject+'"]').click()});
 const palettes=[{wash:'#edeae2',ink:[74,86,69],metal:[158,162,145],warm:[184,114,81]},{wash:'#e5e7da',ink:[69,86,53],metal:[145,162,119],warm:[162,123,83]},{wash:'#e9e3d9',ink:[90,76,60],metal:[163,151,130],warm:[179,111,79]},{wash:'#dfe6e0',ink:[55,84,76],metal:[129,156,148],warm:[160,130,108]},{wash:'#dce1d7',ink:[61,77,57],metal:[122,145,114],warm:[169,133,83]},{wash:'#eee6dc',ink:[102,79,61],metal:[164,144,122],warm:[183,110,78]},{wash:'#e0e5d2',ink:[69,89,47],metal:[133,154,108],warm:[164,126,73]}];

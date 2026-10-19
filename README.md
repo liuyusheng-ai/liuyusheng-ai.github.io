@@ -30,4 +30,5 @@ GitHub Pages 从 main 分支根目录发布。保留 .nojekyll。网站包含经
 - 原创 Canvas 金属曲面背景，随滚动改变视角和色调，尊重减少动态效果偏好。
 - 沟通区提供三种业务问题选择，展示澄清问题、Agent 路线与相关项目入口。
 - 首页强化 People first / Agents, grounded 的沟通与工程定位。
-- 参考 Balenciaga 叙事项目介绍的极简排版、章节节奏与沉浸叙事：https://sayavera.studio/en/the-hands-that-sew-balenciaga-webdoc/ 。这是相近参考案例，尚未确认是用户记忆中的 B 标志品牌。所有页面视觉与曲面代码独立实现。
+- 准确参考站由用户提供：https://www.wearebulletproof.com/ 。分析其公开 Webflow 页面、Vite 模块、GSAP/ScrollTrigger、Lenis，以及 HeroParallax、BScroll、Work 模块。借鉴滚动进度映射、分层视差、标识展开、作品索引的交互思想；所有个人页面代码及 E 标识独立实现。
+- 新增首屏文字分层视差、E 轮廓的滚动展开、作品画廊/索引切换与卡片轻微视差。手机与减少动态效果模式保留简洁布局和原生滚动。
