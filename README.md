@@ -23,3 +23,11 @@ AI Agent / 大模型应用开发作品集。静态 HTML、CSS 与原生 JavaScri
 GitHub Pages 从 main 分支根目录发布。保留 .nojekyll。网站包含经用户确认可公开的联系方式与完整简历下载。
 
 设计参考：https://www.awwwards.com/inspiration/scroll-portfolio 。页面与粒子视觉独立实现。
+
+## 2026-10-19 展览式页面更新
+
+- 七章固定导航、当前章节与阅读进度，滚动后左下角回到顶部。
+- 原创 Canvas 金属曲面背景，随滚动改变视角和色调，尊重减少动态效果偏好。
+- 沟通区提供三种业务问题选择，展示澄清问题、Agent 路线与相关项目入口。
+- 首页强化 People first / Agents, grounded 的沟通与工程定位。
+- 参考 Balenciaga 叙事项目介绍的极简排版、章节节奏与沉浸叙事：https://sayavera.studio/en/the-hands-that-sew-balenciaga-webdoc/ 。这是相近参考案例，尚未确认是用户记忆中的 B 标志品牌。所有页面视觉与曲面代码独立实现。
