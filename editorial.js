@@ -1,8 +1,8 @@
 /* Continuous chapter navigation and an original scroll-driven signal fabric. */
 (()=>{
 'use strict';
-const sections=['home','approach','work','playground','system','about','contact'].map(id=>document.getElementById(id));
-const names=['初次见面','沟通与合作','工程作品','Agent 实验室','系统方法','关于 Eason','开始对话'];
+const sections=['home','approach','work','about','contact'].map(id=>document.getElementById(id));
+const names=['首页','完整介绍','项目案例','教育与实习经历','联系'];
 const header=document.querySelector('.chapter-header'),nav=document.querySelector('.chapter-nav'),links=[...nav.querySelectorAll('a')],backTop=document.querySelector('.back-to-top'),root=document.documentElement;
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)'),layer=document.querySelector('.ambient-layer'),canvas=document.getElementById('ambient-scene'),ctx=canvas.getContext('2d');
 let stops=[],active=-1,layoutFrame=0,scrollFrame=0,pageProgress=0;
@@ -17,7 +17,7 @@ window.addEventListener('scroll',requestReading,{passive:true});window.addEventL
 const heroLines=[document.querySelector('.people-line'),document.querySelector('.agent-line')];
 const monogram=document.querySelector('.ambient-monogram');
 const workSection=document.getElementById('work');
-const projectCards=[...workSection.querySelectorAll('[data-project]')];
+const projectCards=[...workSection.querySelectorAll('.case-study')];
 const viewButtons=[...document.querySelectorAll('[data-work-view]')];
 viewButtons.forEach(button=>button.addEventListener('click',()=>{
  const view=button.dataset.workView;
@@ -26,6 +26,7 @@ viewButtons.forEach(button=>button.addEventListener('click',()=>{
  requestMeasure();
 }));
 function updateEditorialMotion(){
+ if(document.body.classList.contains('clarity-page'))return;
  const desktop=innerWidth>800&&!reduceMotion.matches;
  const heroProgress=Math.max(0,Math.min(1,scrollY/Math.max(1,sections[0].offsetHeight)));
  heroLines.forEach((line,index)=>{
@@ -46,12 +47,16 @@ function updateEditorialMotion(){
   card.style.setProperty('--project-shift',shift.toFixed(1)+'px');
  });
 }
+document.addEventListener('click',event=>{const anchor=event.target.closest('a[href^="#"]');if(!anchor)return;const id=anchor.getAttribute('href').slice(1),target=document.getElementById(id);if(!target)return;let parent=target.closest('details');while(parent){parent.open=true;parent=parent.parentElement.closest('details')}requestMeasure()},{capture:true});
+document.querySelectorAll('details').forEach(detail=>detail.addEventListener('toggle',requestMeasure));
+function openHashTarget(){const target=document.getElementById(location.hash.slice(1));const detail=target?.closest('details');if(detail){detail.open=true;requestMeasure()}}
+window.addEventListener('hashchange',openHashTarget);openHashTarget();
 const briefs={knowledge:{title:'先对齐问题，再选择技术。',questions:['谁会使用这些资料？最常问什么？','资料是否完整、更新、可以追溯？','什么情况必须停止回答或交给人？'],route:'对应实践：养殖场 RAG & Agent → 资料治理、检索、工具与输出护栏。',project:0},research:{title:'把“做份调研”拆成可确认的任务。',questions:['这份报告要帮助谁，做什么决定？','允许使用哪些来源？什么算有效证据？','范围、交付结构和调用预算如何约定？'],route:'对应实践：多角色行业研究 Agent → 规划、证据检索、引用报告与断点恢复。',project:1},data:{title:'先把业务口径与数据权限说清。',questions:['你问的指标，统计口径和时间范围是什么？','哪些表与字段可以使用？结果如何解释？','是否限定只读、最大行数与修复次数？'],route:'对应实践：Text-to-SQL Agent → 意图路由、Schema 检索、只读校验与结果解释。',project:2}};
 let briefProject=0;document.querySelectorAll('[data-brief]').forEach(button=>button.addEventListener('click',()=>{const entry=briefs[button.dataset.brief];briefProject=entry.project;document.querySelectorAll('[data-brief]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));document.getElementById('brief-title').textContent=entry.title;const list=document.getElementById('brief-questions');list.replaceChildren(...entry.questions.map(copy=>{const li=document.createElement('li');li.textContent=copy;return li}));document.getElementById('brief-route').textContent=entry.route}));document.getElementById('brief-project').addEventListener('click',()=>{document.querySelector('[data-filter="all"]').click();document.querySelector('[data-project="'+briefProject+'"]').click()});
 const palettes=[{wash:'#edeae2',ink:[74,86,69],metal:[158,162,145],warm:[184,114,81]},{wash:'#e5e7da',ink:[69,86,53],metal:[145,162,119],warm:[162,123,83]},{wash:'#e9e3d9',ink:[90,76,60],metal:[163,151,130],warm:[179,111,79]},{wash:'#dfe6e0',ink:[55,84,76],metal:[129,156,148],warm:[160,130,108]},{wash:'#dce1d7',ink:[61,77,57],metal:[122,145,114],warm:[169,133,83]},{wash:'#eee6dc',ink:[102,79,61],metal:[164,144,122],warm:[183,110,78]},{wash:'#e0e5d2',ink:[69,89,47],metal:[133,154,108],warm:[164,126,73]}];
 let sceneWidth=0,sceneHeight=0,currentProgress=0,targetProgress=0,sceneFrame=0,lastDraw=0,sceneDirty=true;
 function resizeScene(){const rect=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,1.6);sceneWidth=rect.width;sceneHeight=rect.height;canvas.width=sceneWidth*dpr;canvas.height=sceneHeight*dpr;if(ctx)ctx.setTransform(dpr,0,0,dpr,0,0);sceneDirty=true;queueScene()}
-function queueScene(){if(ctx&&!sceneFrame&&!document.hidden)sceneFrame=requestAnimationFrame(sceneTick)}
+function queueScene(){if(document.body.classList.contains('clarity-page'))return;if(ctx&&!sceneFrame&&!document.hidden)sceneFrame=requestAnimationFrame(sceneTick)}
 function sceneTick(now){sceneFrame=0;if(document.hidden)return;if(now-lastDraw<30){queueScene();return}currentProgress=reduceMotion.matches?targetProgress:currentProgress+(targetProgress-currentProgress)*.09;if(Math.abs(currentProgress-targetProgress)<.0003)currentProgress=targetProgress;drawScene(currentProgress);lastDraw=now;sceneDirty=false;if(currentProgress!==targetProgress)queueScene()}
 function drawScene(progress){if(!ctx||!sceneWidth||!sceneHeight)return;const width=sceneWidth,height=sceneHeight;ctx.clearRect(0,0,width,height);const chapter=Math.min(palettes.length-1,Math.max(0,active)),palette=palettes[chapter],mobile=width<650,rows=mobile?88:136,columns=mobile?8:12,vertices=[];const angleY=-.75+progress*3.1,angleX=.45+Math.sin(progress*Math.PI*3)*.36,angleZ=-.5+progress*1.8;const cy=Math.cos(angleY),sy=Math.sin(angleY),cx=Math.cos(angleX),sx=Math.sin(angleX),cz=Math.cos(angleZ),sz=Math.sin(angleZ),scale=Math.min(width,height)*(mobile?1.04:.72);const centerX=width*(.69+.08*Math.sin(progress*6)),centerY=height*(.48+.16*Math.sin(progress*10));
 function rotate(x,y,z){let xx=x*cy+z*sy,zz=-x*sy+z*cy,yy=y*cx-zz*sx;zz=y*sx+zz*cx;return [xx*cz-yy*sz,xx*sz+yy*cz,zz]}
