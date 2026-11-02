@@ -100,7 +100,7 @@
     knowledge: {
       title: '先对齐问题，再选择技术。',
       questions: ['谁会使用这些资料？最常问什么？', '资料是否完整、更新、可以追溯？', '什么情况必须停止回答，或交给人处理？'],
-      link: ['#case-rag', '养殖场知识检索与 Agent']
+      link: ['#case-rag', '肉牛养殖智能辅助系统']
     },
     research: {
       title: '把“做份调研”拆成可确认的任务。',
@@ -142,7 +142,7 @@
   function tracePlan(mission, condition) {
     if (mission === 'safety') return {
       stopped: true,
-      steps: [['intent', '识别到“删除全部记录”的高风险操作。', 'warn'], ['guard', '操作超出只读权限，拒绝生成执行计划。', 'stop'], ['exit', '不调用数据库工具，也不尝试绕过权限。', 'stop']],
+      steps: [['intent', '识别到“删除全部记录”的高风险操作。', 'warn'], ['guard', '这是写操作，校验规则只放行查询语句，拒绝生成执行计划。', 'stop'], ['exit', '不调用数据库工具，也不尝试绕过校验。', 'stop']],
       result: '已拦截这条示例请求。可以改为查询记录数量或查看汇总；演示没有连接任何数据库。'
     };
     const sql = mission === 'sql';
@@ -153,12 +153,12 @@
     };
     if (condition === 'failure') return {
       stopped: true,
-      steps: [[sql ? 'intent' : 'planner', sql ? '完成查询意图识别，准备只读查询工具。' : '完成研究规划，准备资料检索工具。', 'ok'], ['tool', '示例工具返回超时，记录失败原因。', 'warn'], ['retry 1/1', '受限重试仍失败，触发调用预算边界。', 'warn'], ['exit', '保留失败信息并停止后续生成，不伪装成任务已完成。', 'stop']],
+      steps: [[sql ? 'intent' : 'planner', sql ? '完成查询意图识别，准备查询工具。' : '完成研究规划，准备资料检索工具。', 'ok'], ['tool', '示例工具返回超时，记录失败原因。', 'warn'], ['retry 1/1', '受限重试仍失败，触发调用预算边界。', 'warn'], ['exit', '保留失败信息并停止后续生成，不伪装成任务已完成。', 'stop']],
       result: '工具暂不可用，任务未完成。这里模拟了一次重试后的退出路径；可以切换条件重新体验。'
     };
     if (sql) return {
       stopped: false,
-      steps: [['intent', '提取时间范围、排序维度与“前三名”限制。', 'ok'], ['schema', '使用演示数据表 orders：product、amount、quarter。', 'ok'], ['sql.guard', '仅允许 SELECT 并限制行数；确认没有写入语句。', 'ok'], ['executor', '模拟执行只读聚合查询，返回三个示例产品。', 'ok']],
+      steps: [['intent', '提取时间范围、排序维度与“前三名”限制。', 'ok'], ['schema', '使用演示数据表 orders：product、amount、quarter。', 'ok'], ['sql.guard', '仅允许 SELECT 并限制行数；确认没有写入语句。', 'ok'], ['executor', '模拟执行聚合查询，返回三个示例产品。', 'ok']],
       result: '模拟结果：产品 A ¥12,800 · 产品 B ¥9,600 · 产品 C ¥7,400。以上为说明流程的虚构数据，不来自真实业务。'
     };
     return {

@@ -26,8 +26,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="styles.css?v=20261026">
-  <script src="main.js?v=20261026" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261102">
+  <script src="main.js?v=20261102" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -105,15 +105,15 @@
         <p class="block-label"><span>01</span>完整介绍</p>
         <h2 id="approach-title">你好，我是 Eason，刘雨生。</h2>
         <div class="prose">
-          <p>北京建筑大学人工智能专业本科在读，预计 2027 年毕业，专业成绩前 10%。目前专注 AI Agent 与大模型应用开发，并在<strong>海南君威投资有限公司</strong>远程参与 AI 软件开发。</p>
-          <p>我的工作围绕 <strong>RAG 知识库、多角色 Agent、Text-to-SQL 和后端接口</strong>展开：数据处理、工作流编排、工具调用与工程验证。比起“能跑起来”，我更在意系统有来源、有边界、可评测——遇到空结果、错误调用或模型不可用时，它也知道该如何停下。</p>
+          <p>北京建筑大学人工智能专业本科在读，预计 2027 年毕业，专业成绩前 10%。目前专注 AI Agent 与大模型应用开发，在<strong>海南君威投资有限公司</strong>担任 AI 应用开发实习生，独立完成肉牛养殖智能辅助系统。</p>
+          <p>我的工作围绕 <strong>RAG 知识库、多角色 Agent、Text-to-SQL 和后端接口</strong>展开：数据处理、工作流编排、工具调用与工程验证。比起“能跑起来”，我更在意系统有来源、有边界、可评测——遇到空结果、工具失败或越权请求时，它也知道该如何停下。</p>
           <p>合作时，我会先听懂使用场景，确认任务和边界，再把技术方案与取舍讲清楚；交付时附上来源、测试与可复现评测。</p>
         </div>
 
         <ul class="stats" aria-label="经历概览">
           <li><strong>2<small>段</small></strong><span>实习经历</span></li>
           <li><strong>3<small>个</small></strong><span>Agent 项目</span></li>
-          <li><strong>280<small>项</small></strong><span>RAG 项目测试通过</span></li>
+          <li><strong>1400<small>+项</small></strong><span>肉牛项目后端测试</span></li>
           <li><strong>1<small>万+</small></strong><span>数据产品记录治理</span></li>
         </ul>
 
@@ -144,7 +144,7 @@
               <li>资料是否完整、更新、可以追溯？</li>
               <li>什么情况必须停止回答，或交给人处理？</li>
             </ol>
-            <p class="brief-route">对应实践 <a class="text-link" id="brief-link" href="#case-rag">养殖场知识检索与 Agent <span aria-hidden="true">→</span></a></p>
+            <p class="brief-route">对应实践 <a class="text-link" id="brief-link" href="#case-rag">肉牛养殖智能辅助系统 <span aria-hidden="true">→</span></a></p>
           </div>
         </div>
       </section>
@@ -153,94 +153,94 @@
       <section class="block" id="work" aria-labelledby="work-title">
         <p class="block-label"><span>02</span>项目案例</p>
         <h2 id="work-title">三个项目，三种工程实践。</h2>
-        <p class="block-lead">一段行业应用，与两个开源示例上的个人二次开发。每个案例都写明了问题、个人实现与验证范围。</p>
+        <p class="block-lead">一段行业应用，与两个个人项目。每个案例都写明了问题、个人实现与验证范围。</p>
 
         <div class="cases hover-group">
           <!-- Case 01 -->
           <article class="case" id="case-rag" aria-labelledby="case-rag-title">
-            <p class="case-top"><span class="num">01</span><span>行业应用 · 海南君威 · 2026.05 — 至今</span></p>
-            <h3 id="case-rag-title">养殖场知识检索与 Agent</h3>
-            <p class="case-lead">把分散的养殖资料，变成可追溯的查询入口。</p>
-            <ol class="flow" aria-label="系统链路"><li>资料归集</li><li>清洗分块</li><li>向量入库</li><li>检索与工具</li><li>输出护栏</li></ol>
+            <p class="case-top"><span class="num">01</span><span>行业应用 · 海南君威 · 2026.04 — 至今</span></p>
+            <h3 id="case-rag-title">肉牛养殖智能辅助系统</h3>
+            <p class="case-lead">把分散的养殖资料和业务数据，变成有依据、有权限边界的问答入口。</p>
+            <ol class="flow" aria-label="系统链路"><li>资料加工</li><li>切片入库</li><li>检索与 Skill</li><li>权限与护栏</li><li>评测交付</li></ol>
             <dl class="facts">
-              <div><dt>问题</dt><dd>业务资料分散在多种文件里，查询需要保留依据；模型不可用时，也需要明确的降级方式。</dd></div>
-              <div><dt>做法</dt><dd>整理 15 份资料，构建 67 个知识切片；交付 RAG 接口和工具调用链路，加入参数校验、调用预算与输出护栏。</dd></div>
-              <div><dt>验证</dt><dd>280 项前后端测试通过；含 live-only 场景的整体评测 44/45；确定性链路引用覆盖率 92.9%，无依据回答率 0%。</dd></div>
+              <div><dt>问题</dt><dd>资料分散且不少是扫描版书籍，回答需要保留依据；财务等敏感数据还要按岗位控制谁能看到。</dd></div>
+              <div><dt>做法</dt><dd>从 0 到 1 独立完成设计、开发与交付：搭建 OCR 到入库的加工管线，内置资料扩充至 444 份；基于 ReAct + Skill 路由实现疾病初筛、牛场汇报、财务问答等场景。</dd></div>
+              <div><dt>验证</dt><dd>12 套近 400 条评测集（含 40 条盲测）；真实模型评测任务完成 60/60、高风险拦截 22/22、整体通过率 98.3%；1400+ 项后端与 180+ 项前端自动化测试。</dd></div>
             </dl>
             <ul class="metrics">
-              <li><strong>67</strong><span>可追溯知识切片</span></li>
-              <li><strong>44/45</strong><span>整体评测通过</span></li>
-              <li><strong>280</strong><span>前后端测试通过</span></li>
+              <li><strong>444</strong><span>内置资料份数</span></li>
+              <li><strong>98.3%</strong><span>真实模型评测通过率</span></li>
+              <li><strong>1400+</strong><span>后端自动化测试</span></li>
             </ul>
-            <ul class="tags" aria-label="技术栈"><li>Django / DRF</li><li>ChromaDB</li><li>bge-small-zh</li><li>Ollama</li><li>ReAct</li></ul>
+            <ul class="tags" aria-label="技术栈"><li>Django / DRF</li><li>Vue 3</li><li>ChromaDB</li><li>Ollama</li><li>ReAct</li><li>Docker</li></ul>
             <details class="case-detail" id="case-rag-detail">
               <summary><span class="when-closed">完整技术细节</span><span class="when-open">收起技术细节</span><i class="plus" aria-hidden="true"></i></summary>
               <div class="detail-body">
-                <section><h4>知识如何进入系统</h4><p>归集并校验鲁西牛预算、饲料营养、疾病防控及养殖制度等 15 份资料，兼容 Excel、Word、PDF、TXT、CSV。完成清洗、去重与 500/50 字符分块，67 个知识切片与 ChromaDB 向量 100% 对齐。</p></section>
-                <section><h4>我的实现</h4><p>使用 Django/DRF、BAAI/bge-small-zh-v1.5、ChromaDB 与 Ollama qwen3.5:4b 交付 6 类知识库 / RAG 接口。以 ReAct 风格 Runner 封装疾病初筛与知识检索，加入 Skill 路由、参数校验、调用预算、循环检测、超时重试与药物剂量输出护栏。</p></section>
-                <section><h4>如何验证</h4><p>45 条养牛场景评测，含 40 条确定性与 5 条 live-only。确定性链路中工具选择、参数提取、任务完成及高风险拦截均为 100%；引用覆盖率 92.9%，无依据回答率 0%，P95 33.48ms。240 项后端测试与 40 项前端测试通过。</p></section>
-                <section><h4>工程修复与降级</h4><p>修复错误路由、批量修改拦截、模型工具参数兼容与非标准 JSON 恢复；Ruff、Django 系统检查与生产构建通过。模型不可用时降级为带来源的资料检索。</p></section>
+                <section><h4>知识如何进入系统</h4><p>搭建扫描版养殖书籍加工管线（OCR → 结构适配 → 切片 → 分类 → 入库）。单书试点 65 页产出 146 个切片、132 个有效入库，重复导入 100% 识别跳过。兼容 PDF、Word、Excel、TXT、CSV，按段落累积 500 字切片并保留 50 字重叠。预计算索引随安装包分发，新机首次导入由约 15 分钟缩短至 1 分钟内。</p></section>
+                <section><h4>Agent 与业务</h4><p>基于 ReAct + Skill 路由实现疾病初筛、病例卡、单头牛查询、牛场汇报、财务问答等场景；对接业务平台只读接口，3 万+ 条牛只档案按状态聚合统计；加入同音错字纠正与数字核对护栏，无法在统计结果里找到的数字整句删除。</p></section>
+                <section><h4>安全与权限</h4><p>财务数据按岗位三级授权，金额由程序计算、模型只做解释，全程留审计；构建 19 类套话问法 × 多岗位的攻防题库，任一金额泄露即判失败；回答来源按角色与资料归属实时过滤；财务提问每小时限 30 次，小样本汇总取整防反推单价。</p></section>
+                <section><h4>评测与交付</h4><p>建立 12 套近 400 条 Agentic / Skill 评测集，含 40 条盲测。完成 Docker（PostgreSQL / Redis / Celery / Nginx）部署与 Redis 并发闸门，交付 Windows 桌面安装包及增量自动更新，更新包签名校验，GitHub Actions 自动构建发布。</p></section>
               </div>
             </details>
-            <p class="case-note">评测口径：P95 33.48ms 为确定性链路数据，不代表真实模型推理延迟；含 5 条 live-only 场景的整体结果为 44/45（97.8%）。</p>
+            <p class="case-note">评测口径：60/60、22/22 与 98.3% 来自真实模型评测集，不等同于线上实际使用效果。</p>
           </article>
 
           <!-- Case 02 -->
           <article class="case" id="case-research" aria-labelledby="case-research-title">
-            <p class="case-top"><span class="num">02</span><span>开源示例 · 个人二次开发 · 2026.07</span></p>
+            <p class="case-top"><span class="num">02</span><span>个人项目 · 2026.07</span></p>
             <h3 id="case-research-title">多角色行业研究与报告生成 Agent</h3>
             <p class="case-lead">让规划、检索与报告生成衔接起来，并保留每一条证据。</p>
-            <ol class="flow" aria-label="系统链路"><li>Planner</li><li>Researcher</li><li>证据校验</li><li>Writer</li><li>状态恢复</li></ol>
+            <ol class="flow" aria-label="系统链路"><li>Planner</li><li>Researcher</li><li>无来源拦截</li><li>Writer</li><li>指标评估</li></ol>
             <dl class="facts">
-              <div><dt>问题</dt><dd>研究任务需要拆解、管理来源；工具失败或中断后，需要明确退出或恢复，避免无依据地生成报告。</dd></div>
-              <div><dt>做法</dt><dd>用 LangGraph 编排 Planner、Researcher、Writer；新增 MCP 客户端、预算与重试控制、SQLite 状态记录和断点恢复。</dd></div>
-              <div><dt>验证</dt><dd>11 项自动化测试通过，构建 22 个离线评测场景；6 个 Harness 场景全部通过，本地 stdio MCP 往返验证通过。</dd></div>
+              <div><dt>问题</dt><dd>研究任务需要拆解、管理来源；工具失败或资料不足时要明确停下，避免无依据地生成报告。</dd></div>
+              <div><dt>做法</dt><dd>用 LangGraph 编排 Planner、Researcher、Writer；接入网页搜索、本地 RAG 与 MCP 3 类工具；实现调用预算、超时与重试、无来源停止生成和 SQLite 状态保存。</dd></div>
+              <div><dt>验证</dt><dd>从任务完成、工具调用成功率、引用覆盖率 3 个维度输出指标；自动化测试覆盖带来源报告、调用预算、无来源拦截、检查点恢复和评测口径。</dd></div>
             </dl>
             <ul class="metrics">
               <li><strong>3</strong><span>协作角色</span></li>
-              <li><strong>11</strong><span>自动化测试通过</span></li>
-              <li><strong>22</strong><span>离线评测场景</span></li>
+              <li><strong>3</strong><span>类检索工具</span></li>
+              <li><strong>6</strong><span>次默认调用预算</span></li>
             </ul>
-            <ul class="tags" aria-label="技术栈"><li>LangGraph</li><li>MCP</li><li>SQLite</li><li>Local RAG</li></ul>
+            <ul class="tags" aria-label="技术栈"><li>LangGraph</li><li>MCP</li><li>SQLite</li><li>Tavily</li><li>Local RAG</li></ul>
             <details class="case-detail" id="case-research-detail">
               <summary><span class="when-closed">完整技术细节</span><span class="when-open">收起技术细节</span><i class="plus" aria-hidden="true"></i></summary>
               <div class="detail-body">
-                <section><h4>工作流</h4><p>以 LangGraph 编排 Planner、Researcher、Writer，接入离线 Web 源、Local RAG 和可选 MCP 工具。SQLite 保存状态、调用记录、证据与来源，支持按 run_id 恢复。</p></section>
-                <section><h4>个人新增</h4><p>MCP 客户端与本地 stdio 演示服务；工具空结果语义；预算、循环、超时、重试 Harness；断点恢复与可复现评测。无来源时停止生成，未配置 MCP 时不计为成功调用。</p></section>
-                <section><h4>验证结果</h4><p>11 项自动化测试全部通过。22 个离线场景中，15 个研究任务的完成率、引用覆盖率与有效工具结果率均为 100%；6 个 Harness 场景全部通过；基于官方 MCP Python SDK 的本地 stdio 往返验证通过。</p></section>
-                <section><h4>项目归属</h4><p>在开源工作流示例基础上完成二次开发。上面列出的 MCP 客户端、Harness、断点恢复与评测为个人新增部分。</p></section>
+                <section><h4>工作流</h4><p>以 LangGraph 编排 3 个角色，用共享状态传递计划、证据和调用记录，按来源去重后生成带编号引用的报告。网页搜索（Tavily）、本地 RAG 与 MCP 统一输出证据结构，默认离线可运行，规划与写作模型可替换。</p></section>
+                <section><h4>可靠性控制</h4><p>调用预算默认 6 次，支持超时与重试，没有来源时停止生成；逐次记录工具状态、耗时、结果数和异常，单个工具失败不影响其他工具继续检索。SQLite 保存运行状态与证据，已完成任务可按 run_id 恢复。基于官方 MCP Python SDK 实现 stdio 客户端。</p></section>
+                <section><h4>评测与测试</h4><p>从任务完成、工具调用成功率、引用覆盖率 3 个维度输出 Agentic Eval 指标；自动化测试覆盖带来源报告、调用预算、无来源拦截、检查点恢复和评测口径。</p></section>
+                <section><h4>项目归属</h4><p>个人项目，由本人独立开发，使用 Codex 与 Claude 辅助。</p></section>
               </div>
             </details>
-            <p class="case-note">验证范围：确定性任务 P95 35.06ms；离线资料与本地 MCP 验证不等同于真实联网研究或真实模型质量评测。</p>
+            <p class="case-note">验证范围：默认使用离线演示资料，结果不等同于真实联网研究或真实模型质量评测。</p>
           </article>
 
           <!-- Case 03 -->
           <article class="case" id="case-sql" aria-labelledby="case-sql-title">
-            <p class="case-top"><span class="num">03</span><span>开源示例 · 个人二次开发 · 2026.07</span></p>
+            <p class="case-top"><span class="num">03</span><span>个人项目 · 2026.07</span></p>
             <h3 id="case-sql-title">自然语言数据分析 Agent</h3>
-            <p class="case-lead">把业务问题转成受约束的只读 SQL，再把结果讲清楚。</p>
-            <ol class="flow" aria-label="系统链路"><li>问题理解</li><li>Schema 检索</li><li>SQL 生成</li><li>安全校验</li><li>只读执行</li><li>结果解释</li></ol>
+            <p class="case-lead">把业务问题转成受约束的查询语句，再把结果讲清楚。</p>
+            <ol class="flow" aria-label="系统链路"><li>问题理解</li><li>Schema 检索</li><li>SQL 生成</li><li>安全校验</li><li>查询执行</li><li>结果解释</li></ol>
             <dl class="facts">
               <div><dt>问题</dt><dd>自然语言查询需要对齐数据结构，同时限制危险语句、过量返回和无限修复。</dd></div>
-              <div><dt>做法</dt><dd>重构 6 节点链路与条件路由，新增只读校验、危险函数拦截、修复次数上限和回归测试。</dd></div>
-              <div><dt>验证</dt><dd>50/50 条确定性离线评测通过，危险意图与对抗 SQL 拦截率均为 100%；25 项自动化测试通过。</dd></div>
+              <div><dt>做法</dt><dd>实现 6 节点图，校验失败时经条件路由回到生成节点，修复次数设上限；服务端校验每条 SQL，不把提示词当作唯一防线。</dd></div>
+              <div><dt>验证</dt><dd>自动化测试覆盖正常分析、危险写操作、多语句注入、行数限制和查询历史记录。</dd></div>
             </dl>
             <ul class="metrics">
               <li><strong>6</strong><span>LangGraph 节点</span></li>
-              <li><strong>50/50</strong><span>确定性离线评测</span></li>
-              <li><strong>25</strong><span>自动化测试通过</span></li>
+              <li><strong>14</strong><span>类拦截关键字</span></li>
+              <li><strong>200</strong><span>单次最多返回行数</span></li>
             </ul>
             <ul class="tags" aria-label="技术栈"><li>FastAPI</li><li>LangGraph</li><li>SQLAlchemy</li><li>Plotly</li></ul>
             <details class="case-detail" id="case-sql-detail">
               <summary><span class="when-closed">完整技术细节</span><span class="when-open">收起技术细节</span><i class="plus" aria-hidden="true"></i></summary>
               <div class="detail-body">
-                <section><h4>完整链路</h4><p>问题理解 → Schema 检索 → SQL 生成 → 安全校验 → 只读执行 → 结果解释。通过 FastAPI、SQLAlchemy 和 Plotly 提供查询、历史记录及可视化接口，支持受限自动修复。</p></section>
-                <section><h4>安全边界</h4><p>SELECT 白名单、单语句、超时、最大行数、SQL 长度与修复次数限制；拦截 INSERT、UPDATE、DELETE、DROP、PRAGMA、ATTACH 及危险数据库函数，拒绝空问题并识别危险业务意图。</p></section>
-                <section><h4>个人新增</h4><p>重构 6 节点图和条件路由，新增只读安全校验、危险函数拦截、空问题拒绝、自动修复上限、FastAPI 接口与扩展回归测试。</p></section>
-                <section><h4>评测覆盖</h4><p>50 条离线评测覆盖 25 条正常查询、10 条危险自然语言请求及 15 条对抗 SQL，全部通过。</p></section>
+                <section><h4>完整链路</h4><p>问题理解 → Schema 检索 → SQL 生成 → 安全校验 → 查询执行 → 结果解释。通过 FastAPI、SQLAlchemy 提供查询和历史记录接口，并生成 Plotly 兼容图表配置，支持受限自动修复。</p></section>
+                <section><h4>安全边界</h4><p>服务端校验每条 SQL，仅允许单条 SELECT / WITH，过滤注释后拦截 INSERT、UPDATE、DELETE、DROP、PRAGMA、ATTACH 等 14 类关键字；单次最多返回 200 行，执行超时 3 秒。模型适配层可替换，生成结果都必须通过校验。</p></section>
+                <section><h4>工程设计</h4><p>内置离线演示数据和规则版生成器，无需 API Key 即可运行；默认 SQLite，可通过 DATABASE_URL 接入其他数据库；查询历史保留问题、SQL、行数和执行状态，便于复核。</p></section>
+                <section><h4>项目归属</h4><p>个人项目，由本人独立开发，使用 Codex 与 Claude 辅助。</p></section>
               </div>
             </details>
-            <p class="case-note">验证范围：查询链路 P95 8.87ms 来自确定性离线评测，不等同于真实大模型生成 SQL 的端到端表现。</p>
+            <p class="case-note">验证范围：测试基于离线演示数据和规则版生成器，不等同于真实大模型生成 SQL 的端到端表现。</p>
           </article>
         </div>
       </section>
@@ -252,14 +252,15 @@
 
         <ol class="timeline hover-group">
           <li class="job">
-            <p class="job-when">2026.05 — <br>至今</p>
+            <p class="job-when">2026.04 — <br>至今</p>
             <div>
               <h3>海南君威投资有限公司</h3>
-              <p class="job-role">AI 软件开发辅助岗 · 远程 / 兼职</p>
+              <p class="job-role">AI 应用开发实习生</p>
               <ul>
-                <li><b>知识库建设</b>归集并校验 15 份业务资料，兼容 5 种文件格式，生成 67 个可追溯知识切片。</li>
-                <li><b>RAG 与 Agent</b>交付 6 类知识库 / RAG 接口，以 ReAct 风格 Runner 封装疾病初筛与知识检索工具。</li>
-                <li><b>评测与工程</b>构建 45 条场景评测集；240 项后端测试与 40 项前端测试通过。</li>
+                <li><b>项目职责</b>独立完成肉牛养殖智能辅助系统从 0 到 1 的设计、开发与交付，累计后端 6 万+ 行 Python、前端 2 万+ 行 Vue 代码。</li>
+                <li><b>知识库工程</b>搭建扫描版书籍加工管线，内置资料扩充至 444 份；预计算索引使新机首次导入由约 15 分钟缩短至 1 分钟内。</li>
+                <li><b>Agent 与安全</b>基于 ReAct + Skill 路由实现疾病初筛、牛场汇报、财务问答等场景；财务数据按岗位三级授权，金额由程序计算、模型只做解释。</li>
+                <li><b>评测与交付</b>12 套近 400 条评测集，真实模型评测整体通过率 98.3%；1400+ 项后端与 180+ 项前端测试；交付 Docker 部署与 Windows 安装包。</li>
               </ul>
               <a class="text-link" href="#case-rag">对应案例 01 <span aria-hidden="true">→</span></a>
             </div>
@@ -282,7 +283,7 @@
               <h3>北京建筑大学</h3>
               <p class="job-role">人工智能 · 本科在读 · 智能科学与技术学院</p>
               <ul>
-                <li><b>成绩排名</b>专业前 10%。</li>
+                <li><b>成绩与语言</b>专业前 10%；英语 CET-4。</li>
                 <li><b>相关课程</b>人工智能基础 90.3 · 离散数学 92.4 · 数据结构与算法综合实验 100 · 软件开发大型实验 100 · 数据挖掘实践 91。</li>
                 <li><b>在修课程</b>多智能体系统、神经网络与深度学习、知识表示与处理、操作系统。</li>
               </ul>
@@ -293,9 +294,9 @@
         <div class="skills" id="skills">
           <h3 class="sub-title">技术栈</h3>
           <dl>
-            <div><dt>编程与后端</dt><dd>Python · 数据结构与算法 · SQL · Django / DRF · FastAPI · Celery / Redis · SQLAlchemy · SQLite / PostgreSQL · RESTful API</dd></div>
-            <div><dt>大模型应用</dt><dd>Prompt Engineering · RAG · Embedding · ChromaDB · LangGraph · ReAct · Tool Calling · MCP · 角色协作式 Agent 工作流</dd></div>
-            <div><dt>工程与评测</dt><dd>Pytest · Git · Agentic Eval：任务完成率、工具选择 / 参数提取、引用覆盖、安全拦截、无依据回答率与延迟</dd></div>
+            <div><dt>编程与后端</dt><dd>Python · SQL · 数据结构与算法 · Django / DRF · FastAPI · Celery / Redis · SQLAlchemy · PostgreSQL / SQLite · RESTful API · SSE · Vue 3 / Element Plus / Pinia · Gunicorn / Nginx · JWT</dd></div>
+            <div><dt>大模型应用</dt><dd>Prompt / 上下文工程 · RAG · Embedding · ChromaDB · OCR 文档加工 · LangGraph · ReAct · Tool Calling · MCP · 多角色 Agent 工作流 · Ollama · 向量 + BM25 混合检索 · 输出护栏与数字校验</dd></div>
+            <div><dt>工程与评测</dt><dd>Pytest · Git · Docker · GitHub Actions · Claude Code / Codex 辅助编程 · Agentic Eval：工具选择 / 参数提取、引用覆盖、安全拦截、无依据回答率与延迟 · 熔断与退避重试 · Ruff · 并发压测</dd></div>
           </dl>
         </div>
         <a class="text-link resume-link" href="resume.docx" download="Eason-刘雨生-简历.docx">下载完整简历（Word） <span aria-hidden="true">↓</span></a>
