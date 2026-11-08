@@ -6,7 +6,8 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const EMAIL = 'liuyusheng_ai@163.com';
+  // The address is written once, in the page's mailto links; scripts read it from there.
+  const EMAIL = ($('a[data-mail]')?.getAttribute('href') || '').replace(/^mailto:/, '').split('?')[0];
 
   /* =============================================================
      Content — all copy shown by scripts lives here, apart from behavior.
@@ -158,6 +159,11 @@
   }
 
   /* ---------- Deep links open the <details> that holds the target ---------- */
+  // Shared links can arrive truncated (“#%E0%A4%A”); a bad escape must not throw.
+  function idFromHash(hash) {
+    try { return decodeURIComponent(hash.slice(1)); } catch { return ''; }
+  }
+
   function revealTarget(id) {
     const target = id && document.getElementById(id);
     if (!target) return null;
@@ -167,7 +173,7 @@
   }
 
   function initDeepLinks() {
-    const fromHash = hash => revealTarget(decodeURIComponent(hash.slice(1)));
+    const fromHash = hash => revealTarget(idFromHash(hash));
     document.addEventListener('click', event => {
       const link = event.target.closest('a[href^="#"]');
       if (link && link.hash.length > 1) fromHash(link.hash);
@@ -180,7 +186,6 @@
     }
     addEventListener('beforeprint', () => $$('.case-detail').forEach(detail => { detail.open = true; }));
   }
-
 
   /* ---------- “Start with your question” brief ---------- */
   function initBrief() {
@@ -224,11 +229,13 @@
       state.className = `term-state${kind ? ` is-${kind}` : ''}`;
     }
 
+    // The run button is always actionable: run → pause → resume, and “run again” once finished.
     function renderControls() {
       const done = step >= plan().steps.length;
-      runButton.disabled = done;
+      const [label, icon] = running() ? ['暂停', 'Ⅱ'] : done ? ['重新运行', '↺'] : step ? ['继续', '▶'] : ['运行', '▶'];
+      runButton.firstChild.textContent = `${label} `;
+      runButton.lastElementChild.textContent = icon;
       stepButton.disabled = done || running();
-      runButton.firstChild.textContent = running() ? '暂停 ' : step && !done ? '继续 ' : '运行 ';
     }
 
     function stop() { clearTimeout(timer); timer = null; }
@@ -284,6 +291,7 @@
         renderControls();
         return;
       }
+      if (step >= plan().steps.length) reset();
       timer = 0; // marks “running” before the first line lands
       renderControls();
       autoAdvance();
@@ -319,40 +327,64 @@
     }));
 
     const copyButton = $('#copy-email');
+    const copyStatus = $('#copy-status');
     let resetTimer;
     copyButton.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(EMAIL);
-        copyButton.textContent = '已复制 ✓';
-      } catch {
-        copyButton.textContent = '请手动复制';
-      }
+      const copied = await copyText(EMAIL);
+      copyButton.textContent = copied ? '已复制 ✓' : '请长按邮箱复制';
+      copyStatus.textContent = copied ? `邮箱 ${EMAIL} 已复制` : '无法自动复制，请长按或选中邮箱地址复制';
       clearTimeout(resetTimer);
-      resetTimer = setTimeout(() => { copyButton.textContent = '复制'; }, 2400);
+      resetTimer = setTimeout(() => { copyButton.textContent = '复制'; copyStatus.textContent = ''; }, 2400);
     });
   }
 
-  /* ---------- Gentle reveal for content below the fold ---------- */
-  function initReveal() {
-    if (reduceMotion.matches || !('IntersectionObserver' in window)) return;
-    const targets = $$('.stats, .method, .brief, .case, .job, .skills, .terminal, .contact-list')
-      .filter(element => element.getBoundingClientRect().top > innerHeight);
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('is-visible');
-      observer.unobserve(entry.target);
-      // Hand transitions back to the component (hover states) once the entrance finishes.
-      setTimeout(() => entry.target.classList.remove('reveal', 'is-visible'), 800);
-    }), { rootMargin: '0px 0px -6% 0px' });
-    targets.forEach(element => { element.classList.add('reveal'); observer.observe(element); });
+  // Clipboard API where allowed; otherwise the legacy selection copy, which older browsers
+  // and some in-app browsers (e.g. WeChat) still support.
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try { await navigator.clipboard.writeText(text); return true; } catch {}
+    }
+    const active = document.activeElement;
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.className = 'sr-only';
+    document.body.append(area);
+    area.select();
+    area.setSelectionRange(0, text.length); // iOS ignores select() alone
+    let copied = false;
+    try { copied = document.execCommand('copy'); } catch {}
+    area.remove();
+    active?.focus({ preventScroll: true });
+    return copied;
   }
 
-  initTheme();
-  initSpotlight();
-  initNavigation();
-  initDeepLinks();
-  initBrief();
-  initLab();
-  initContact();
-  initReveal();
+  /* ---------- Gentle reveal for content below the fold ----------
+     Fail-safe: an element is hidden only after the observer's first report confirms it is
+     below the viewport. If observers never fire, nothing is ever hidden. */
+  function initReveal() {
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) return;
+    const reported = new WeakSet();
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      const element = entry.target;
+      if (!reported.has(element)) {
+        reported.add(element);
+        const fold = entry.rootBounds ? entry.rootBounds.bottom : innerHeight;
+        if (!entry.isIntersecting && entry.boundingClientRect.top > fold) element.classList.add('reveal');
+        else observer.unobserve(element); // already on screen (or above it): leave it alone
+        return;
+      }
+      if (!entry.isIntersecting) return;
+      element.classList.add('is-visible');
+      observer.unobserve(element);
+      // Hand transitions back to the component (hover states) once the entrance finishes.
+      setTimeout(() => element.classList.remove('reveal', 'is-visible'), 800);
+    }), { rootMargin: '0px 0px -6% 0px' });
+    $$('.stats, .method, .brief, .case, .job, .skills, .terminal, .contact-list').forEach(element => observer.observe(element));
+  }
+
+  // Each feature starts on its own: one failing (an old browser, a missing element) leaves the rest working.
+  [initTheme, initSpotlight, initNavigation, initDeepLinks, initBrief, initLab, initContact, initReveal].forEach(init => {
+    try { init(); } catch (error) { console.error(`[site] ${init.name} failed:`, error); }
+  });
 })();

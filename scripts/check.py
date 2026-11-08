@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
-"""Pre-publish checks for the static site. Run from anywhere: python3 scripts/check.py
+"""Pre-publish checks for the static site. Run from anywhere:
 
-Checks: duplicate ids, in-page anchors, local asset references (HTML and CSS),
-ids the script looks up, JS syntax (if node is installed), cache-busting versions,
-and text contrast of the theme tokens against WCAG AA (4.5:1).
-Exits non-zero when anything fails.
+    python3 scripts/check.py            # check only
+    python3 scripts/check.py --fix-csp  # also rewrite the CSP hash after editing the inline script
+
+Checks: duplicate ids, in-page anchors, local asset references (HTML and CSS), site-absolute
+URLs (e.g. the share image), ids the script looks up, JS syntax (if node is installed),
+cache-busting versions, the inline theme script against each page's Content-Security-Policy,
+no inline styles or handlers (the CSP would block them), and text contrast of both themes
+against WCAG AA (4.5:1). Exits non-zero when anything fails.
 """
+import base64
+import hashlib
 import re
 import shutil
 import subprocess
@@ -15,14 +21,21 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+SITE = 'https://liuyusheng-ai.github.io/'
 PAGES = ['index.html', '404.html']
 TEXT_TOKENS = ('ink', 'ink-soft', 'muted', 'faint', 'accent', 'sage')
+INLINE_SCRIPT = re.compile(r'<script>(.*?)</script>', re.S)  # plain inline JS; not src=, not JSON-LD
+CSP_META = re.compile(r'(<meta http-equiv="Content-Security-Policy" content=")([^"]+)(">)')
 failures = []
 
 
 def fail(message):
     failures.append(message)
     print(f'  ✗ {message}')
+
+
+def read(name):
+    return (ROOT / name).read_text(encoding='utf-8')
 
 
 class Collector(HTMLParser):
@@ -42,20 +55,24 @@ class Collector(HTMLParser):
 
 
 def local_path(ref, page):
-    """Map a local href/src to a file under ROOT, or None for external/in-page refs."""
-    if re.match(r'^(https?:|mailto:|tel:|data:|#)', ref):
+    """Map a local or site-absolute href/src to a file under ROOT; None for external/in-page refs."""
+    if ref.startswith(SITE):
+        ref = '/' + ref[len(SITE):]
+    elif re.match(r'^(https?:|mailto:|tel:|data:|#)', ref):
         return None
     ref = ref.split('#')[0].split('?')[0]
     if not ref:
         return None
+    if ref == '/':
+        return ROOT / 'index.html'
     return ROOT / ref.lstrip('/') if ref.startswith('/') else (ROOT / page).parent / ref
 
 
 def check_pages():
     index_ids = set()
     for page in PAGES:
-        print(f'{page}')
-        html = (ROOT / page).read_text(encoding='utf-8')
+        print(page)
+        html = read(page)
         parser = Collector()
         parser.feed(html)
         ids = set(parser.ids)
@@ -64,7 +81,8 @@ def check_pages():
         for dup, n in Counter(parser.ids).items():
             if n > 1:
                 fail(f'duplicate id "{dup}" ({n}×)')
-        for ref in parser.refs:
+        meta_urls = re.findall(r'<meta [^>]*content="(' + re.escape(SITE) + r'[^"]*)"', html)
+        for ref in parser.refs + meta_urls:
             if ref.startswith('#') and len(ref) > 1 and ref[1:] not in ids:
                 fail(f'anchor {ref} has no matching id')
             path = local_path(ref, page)
@@ -73,12 +91,49 @@ def check_pages():
         for use in re.findall(r'<use href="#([^"]+)"', html):
             if use not in ids:
                 fail(f'<use> points to missing symbol #{use}')
+        if re.search(r'<[^>]+\sstyle="', html):
+            fail('inline style attribute (the CSP style-src blocks it; use a class)')
+        if re.search(r'<[^>]+\son[a-z]+="', html):
+            fail('inline event handler attribute (the CSP blocks it; bind it in main.js)')
     return index_ids
+
+
+def script_hash(body):
+    return base64.b64encode(hashlib.sha256(body.encode('utf-8')).digest()).decode()
+
+
+def check_csp(fix):
+    print('inline script & CSP' + (' (fixing)' if fix else ''))
+    bodies = {}
+    for page in PAGES:
+        html = read(page)
+        scripts = INLINE_SCRIPT.findall(html)
+        bodies[page] = scripts
+        meta = CSP_META.search(html)
+        if not meta:
+            fail(f'{page}: no Content-Security-Policy meta')
+            continue
+        needed = [script_hash(body) for body in scripts]
+        allowed = re.findall(r"'sha256-([A-Za-z0-9+/=]+)'", meta.group(2))
+        if fix and sorted(needed) != sorted(allowed):
+            policy = re.sub(r"\s*'sha256-[A-Za-z0-9+/=]+'", '', meta.group(2))
+            policy = policy.replace("script-src 'self'", "script-src 'self'" + ''.join(f" 'sha256-{h}'" for h in needed))
+            (ROOT / page).write_text(html[:meta.start(2)] + policy + html[meta.end(2):], encoding='utf-8')
+            print(f'  ↻ {page}: CSP now allows ' + ', '.join(f'sha256-{h}' for h in needed))
+            continue
+        for digest in needed:
+            if digest not in allowed:
+                fail(f'{page}: inline script hash sha256-{digest} is not in the CSP — run with --fix-csp')
+        for digest in allowed:
+            if digest not in needed:
+                fail(f'{page}: CSP allows sha256-{digest}, which matches no inline script — run with --fix-csp')
+    if len({tuple(v) for v in bodies.values()}) > 1:
+        fail('index.html and 404.html inline scripts differ (keep them identical)')
 
 
 def check_css():
     print('styles.css')
-    css = (ROOT / 'styles.css').read_text(encoding='utf-8')
+    css = read('styles.css')
     for ref in re.findall(r'url\("?([^")]+)"?\)', css):
         if not ref.startswith('data:') and not (ROOT / ref).exists():
             fail(f'CSS url() missing file: {ref}')
@@ -87,7 +142,7 @@ def check_css():
 
 def check_js(index_ids):
     print('main.js')
-    js = (ROOT / 'main.js').read_text(encoding='utf-8')
+    js = read('main.js')
     for ref in sorted(set(re.findall(r"\$\('#([\w-]+)'\)", js))):
         if ref not in index_ids:
             fail(f'script looks up #{ref}, which index.html does not have')
@@ -103,7 +158,7 @@ def check_versions():
     print('cache versions')
     versions = set()
     for page in PAGES:
-        versions |= set(re.findall(r'(?:styles\.css|main\.js)\?v=(\d+)', (ROOT / page).read_text(encoding='utf-8')))
+        versions |= set(re.findall(r'(?:styles\.css|main\.js)\?v=([\w.-]+)', read(page)))
     if len(versions) != 1:
         fail(f'pages reference different asset versions: {sorted(versions)}')
 
@@ -136,6 +191,8 @@ def check_contrast(css):
 
 
 def main():
+    fix = '--fix-csp' in sys.argv[1:]
+    check_csp(fix)
     index_ids = check_pages()
     css = check_css()
     check_js(index_ids)

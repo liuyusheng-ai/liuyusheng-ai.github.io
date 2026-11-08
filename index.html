@@ -3,6 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Only this site’s own files may load or run. The hash allows the inline theme script below;
+       scripts/check.py recomputes it, so edit that script and the check will flag a stale hash. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-UQi4QJsRbXsmhoupUpbZtBnbbLbXjKE1fY7R3+Ke+KQ='; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="format-detection" content="telephone=no">
   <title>Eason 刘雨生 · AI Agent / 大模型应用开发</title>
   <meta name="description" content="Eason 刘雨生，北京建筑大学人工智能专业 2027 届。专注 AI Agent 与大模型应用开发：理解业务、讲清方案，构建有来源、有边界、可评测的 RAG 与多智能体系统。">
   <meta name="theme-color" content="#0d0f0d">
@@ -21,20 +25,25 @@
   <meta name="twitter:title" content="Eason 刘雨生 · AI Agent / 大模型应用开发">
   <meta name="twitter:description" content="把需求聊清楚，让 AI 真正落地。知识检索、多智能体协作与 Text-to-SQL 项目案例。">
   <meta name="twitter:image" content="https://liuyusheng-ai.github.io/og-image.jpg">
+  <link rel="icon" href="favicon.ico" sizes="32x32">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <!-- Apply a saved theme before first paint. Dark is the default. -->
   <script>
     (function () {
+      var root = document.documentElement;
+      root.className += ' js';
       try {
         var saved = localStorage.getItem('eason-theme');
-        if (saved === 'light' || saved === 'dark') document.documentElement.setAttribute('data-theme', saved);
+        if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+        if (saved === 'light') document.querySelector('meta[name="theme-color"]').content = '#f4f1ea';
       } catch (e) {}
     })();
   </script>
   <!-- Fonts are self-hosted Latin subsets; all Chinese text uses system fonts. The name font is above the fold, so preload it. -->
   <link rel="preload" href="fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=20261108">
-  <script src="main.js?v=20261108" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261108.2">
+  <script src="main.js?v=20261108.2" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -60,11 +69,12 @@
   <a class="skip-link" href="#content">跳到正文</a>
   <div class="spotlight" aria-hidden="true"></div>
 
-  <!-- Compact bar for narrow screens; the sticky intro column takes this role on desktop. -->
-  <header class="topbar">
+  <!-- Compact bar for narrow screens; the sticky intro column takes this role on desktop.
+       A <div>, not <header>: the page keeps a single banner landmark (the intro column). -->
+  <div class="topbar">
     <div class="topbar-row">
       <a class="topbar-brand" href="#top" aria-label="Eason 刘雨生 · 回到顶部">Eason<span>刘雨生</span></a>
-      <button class="theme-toggle" type="button" aria-label="切换浅色 / 深色">
+      <button class="theme-toggle js-only" type="button" aria-label="切换浅色 / 深色">
         <svg class="icon icon-sun" aria-hidden="true"><use href="#icon-sun"/></svg>
         <svg class="icon icon-moon" aria-hidden="true"><use href="#icon-moon"/></svg>
       </button>
@@ -76,14 +86,14 @@
       <a href="#playground">实验室</a>
       <a href="#contact">联系</a>
     </nav>
-  </header>
+  </div>
 
   <div class="layout" id="top">
     <!-- ============ Identity column (sticky on desktop) ============ -->
     <header class="intro">
       <div class="intro-main">
         <p class="status"><span class="pulse" aria-hidden="true"></span>2027 届 · 正在寻找 AI Agent 相关机会</p>
-        <h1 class="name"><span class="name-en" lang="en">Eason</span><span class="name-cn">刘雨生</span></h1>
+        <h1 class="name"><span class="name-en" lang="en">Eason</span> <span class="name-cn">刘雨生</span></h1>
         <p class="role">AI Agent / 大模型应用开发</p>
         <p class="pitch">把需求聊清楚，<br><em>让 AI 真正落地。</em></p>
         <p class="intro-lead">专注知识检索、多智能体协作与后端工程。从理解业务开始，把想法做成有来源、有边界、可验证的系统。</p>
@@ -103,9 +113,9 @@
           <a class="btn btn-quiet" href="#work">查看项目案例 <span aria-hidden="true">→</span></a>
         </div>
         <div class="intro-links">
-          <a href="https://github.com/liuyusheng-ai" target="_blank" rel="me noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/liuyusheng-ai" target="_blank" rel="me noopener noreferrer">GitHub <span aria-hidden="true">↗</span><span class="sr-only">（在新标签页打开）</span></a>
           <a href="mailto:liuyusheng_ai@163.com" data-mail>liuyusheng_ai@163.com</a>
-          <button class="theme-toggle" type="button" aria-label="切换浅色 / 深色">
+          <button class="theme-toggle js-only" type="button" aria-label="切换浅色 / 深色">
             <svg class="icon icon-sun" aria-hidden="true"><use href="#icon-sun"/></svg>
             <svg class="icon icon-moon" aria-hidden="true"><use href="#icon-moon"/></svg>
           </button>
@@ -113,8 +123,10 @@
       </div>
     </header>
 
-    <main class="content" id="content">
-      <!-- ============ 01 完整介绍 ============ -->
+    <main class="content" id="content" tabindex="-1">
+      <!-- ============ 01 完整介绍 ============
+           Section ids are kept from earlier versions so links people already shared keep working:
+           #approach = 完整介绍, #work = 项目案例, #about = 教育与实习经历, #playground = 实验室. -->
       <section class="block" id="approach" aria-labelledby="approach-title">
         <p class="block-label"><span>01</span>完整介绍</p>
         <h2 id="approach-title">你好，我是 Eason，刘雨生。</h2>
@@ -144,9 +156,9 @@
         <div class="brief" id="brief">
           <div class="brief-head">
             <h3 class="sub-title">合作从提问开始</h3>
-            <p>选一个常见需求，看看我会先和你确认什么。</p>
+            <p class="js-only">选一个常见需求，看看我会先和你确认什么。</p>
           </div>
-          <div class="brief-options" role="group" aria-label="选择业务问题">
+          <div class="brief-options js-only" role="group" aria-label="选择业务问题">
             <button class="chip" type="button" data-brief="knowledge" aria-pressed="true">资料很多，怎么让它用起来？</button>
             <button class="chip" type="button" data-brief="research" aria-pressed="false">调研很耗时，能否拆开协作？</button>
             <button class="chip" type="button" data-brief="data" aria-pressed="false">能不能直接问数据一个问题？</button>
@@ -328,7 +340,7 @@
             <span class="term-title">agent-run · local preset</span>
             <span class="term-state" id="term-state">idle</span>
           </div>
-          <div class="term-config">
+          <div class="term-config js-only">
             <div class="term-row" role="group" aria-label="选择任务">
               <span class="term-key">任务</span>
               <button type="button" data-mission="research" aria-pressed="true">研究一个行业</button>
@@ -345,10 +357,11 @@
           <div class="term-screen">
             <p class="term-cmd"><span class="term-prompt" aria-hidden="true">$</span> agent run <span id="term-task">“请整理某行业的关键趋势，并给出资料来源。”</span></p>
             <ol class="term-log" id="term-log" aria-live="polite"></ol>
-            <p class="term-idle" id="term-idle">按“运行”逐行查看执行轨迹，或用“单步”自己控制节奏。</p>
+            <p class="term-idle js-only" id="term-idle">按“运行”逐行查看执行轨迹，或用“单步”自己控制节奏。</p>
+            <p class="term-idle no-js-only">这个演示需要浏览器启用 JavaScript。它只是本地预设的执行轨迹，不调用模型，也不采集输入。</p>
             <div class="term-result" id="term-result" role="status" hidden></div>
           </div>
-          <div class="term-actions">
+          <div class="term-actions js-only">
             <button type="button" class="term-btn term-btn-primary" id="term-run">运行 <span aria-hidden="true">▶</span></button>
             <button type="button" class="term-btn" id="term-step">单步 <span aria-hidden="true">→</span></button>
             <button type="button" class="term-btn" id="term-reset">重置 <span aria-hidden="true">↺</span></button>
@@ -362,21 +375,22 @@
         <h2 class="contact-title" id="contact-title">一起聊聊<br><em>具体的项目。</em></h2>
         <p class="block-lead">招聘、项目合作或技术交流，欢迎直接联系。</p>
 
-        <div class="intents" role="group" aria-label="选择联系主题">
+        <div class="intents js-only" role="group" aria-label="选择联系主题">
           <button class="chip" type="button" data-intent="招聘交流" aria-pressed="false">我在寻找 AI 开发者</button>
           <button class="chip" type="button" data-intent="项目合作" aria-pressed="false">聊聊一个项目</button>
           <button class="chip" type="button" data-intent="技术交流" aria-pressed="false">一起交流技术</button>
         </div>
-        <p class="intent-note" id="intent-note" role="status">选择主题后，邮件链接会带上对应标题；不会自动发送任何内容。</p>
+        <p class="intent-note js-only" id="intent-note" role="status">选择主题后，邮件链接会带上对应标题；不会自动发送任何内容。</p>
 
         <ul class="contact-list">
           <li>
             <span class="contact-key">邮箱</span>
             <a href="mailto:liuyusheng_ai@163.com" data-mail>liuyusheng_ai@163.com</a>
-            <button type="button" class="copy-btn" id="copy-email">复制</button>
+            <button type="button" class="copy-btn js-only" id="copy-email">复制</button>
+            <span class="sr-only" id="copy-status" role="status"></span>
           </li>
           <li><span class="contact-key">电话</span><a href="tel:+8615893558838">158 9355 8838</a></li>
-          <li><span class="contact-key">GitHub</span><a href="https://github.com/liuyusheng-ai" target="_blank" rel="me noopener noreferrer">github.com/liuyusheng-ai <span aria-hidden="true">↗</span></a></li>
+          <li><span class="contact-key">GitHub</span><a href="https://github.com/liuyusheng-ai" target="_blank" rel="me noopener noreferrer">github.com/liuyusheng-ai <span aria-hidden="true">↗</span><span class="sr-only">（在新标签页打开）</span></a></li>
           <li><span class="contact-key">简历</span><a href="resume.docx" download="Eason-刘雨生-简历.docx">下载完整简历 <span aria-hidden="true">↓</span></a></li>
         </ul>
       </section>

@@ -3,26 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Only this site’s own files may load or run. The hash allows the inline theme script below;
+       scripts/check.py recomputes it, so edit that script and the check will flag a stale hash. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-UQi4QJsRbXsmhoupUpbZtBnbbLbXjKE1fY7R3+Ke+KQ='; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="format-detection" content="telephone=no">
   <title>页面不存在 · Eason 刘雨生</title>
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#0d0f0d">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <!-- GitHub Pages serves this page for any missing path, so every asset path is root-absolute. -->
   <script>
     (function () {
+      var root = document.documentElement;
+      root.className += ' js';
       try {
         var saved = localStorage.getItem('eason-theme');
-        if (saved === 'light' || saved === 'dark') document.documentElement.setAttribute('data-theme', saved);
+        if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+        if (saved === 'light') document.querySelector('meta[name="theme-color"]').content = '#f4f1ea';
       } catch (e) {}
     })();
   </script>
   <link rel="preload" href="/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/styles.css?v=20261108">
+  <link rel="stylesheet" href="/styles.css?v=20261108.2">
 </head>
 <body>
   <main class="notfound">
     <p class="block-label"><span>404</span>页面不存在</p>
-    <h1 class="name"><span class="name-en" lang="en">Eason</span><span class="name-cn">刘雨生</span></h1>
+    <h1 class="name"><span class="name-en" lang="en">Eason</span> <span class="name-cn">刘雨生</span></h1>
     <p class="pitch">这个页面没有找到，<br><em>但你要找的人在这里。</em></p>
     <p class="block-lead">链接可能已经变更。可以从首页开始，或直接看项目案例。</p>
     <div class="intro-actions">
