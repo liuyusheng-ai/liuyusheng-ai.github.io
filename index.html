@@ -40,10 +40,11 @@
       } catch (e) {}
     })();
   </script>
-  <!-- Fonts are self-hosted Latin subsets; all Chinese text uses system fonts. The name font is above the fold, so preload it. -->
+  <!-- Fonts are self-hosted Latin subsets; all Chinese text uses system fonts. Both appear in the first screen, so preload them. -->
   <link rel="preload" href="fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=20261108.2">
-  <script src="main.js?v=20261108.2" defer></script>
+  <link rel="preload" href="fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=20261108.11">
+  <script src="main.js?v=20261108.11" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -67,80 +68,239 @@
     <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
   </svg>
   <a class="skip-link" href="#content">跳到正文</a>
-  <div class="spotlight" aria-hidden="true"></div>
 
-  <!-- Compact bar for narrow screens; the sticky intro column takes this role on desktop.
-       A <div>, not <header>: the page keeps a single banner landmark (the intro column). -->
-  <div class="topbar">
-    <div class="topbar-row">
-      <a class="topbar-brand" href="#top" aria-label="Eason 刘雨生 · 回到顶部">Eason<span>刘雨生</span></a>
-      <button class="theme-toggle js-only" type="button" aria-label="切换浅色 / 深色">
-        <svg class="icon icon-sun" aria-hidden="true"><use href="#icon-sun"/></svg>
-        <svg class="icon icon-moon" aria-hidden="true"><use href="#icon-moon"/></svg>
-      </button>
+  <!-- ============ Site bar — the only thing that stays on screen ============ -->
+  <header class="bar" id="top">
+    <div class="wrap bar-inner">
+      <a class="bar-brand" href="#home" aria-label="Eason 刘雨生 · 回到顶部"><span lang="en">Eason</span> <span class="bar-brand-cn">刘雨生</span></a>
+      <nav class="bar-nav" aria-label="章节导航" data-nav>
+        <a href="#work">项目<sup aria-hidden="true">3</sup><span class="sr-only">（3 个）</span></a>
+        <a href="#approach">关于</a>
+        <a href="#about">经历</a>
+        <a href="#playground">实验室</a>
+        <a href="#contact">联系</a>
+      </nav>
+      <div class="bar-actions">
+        <a class="bar-link" href="resume.docx" download="Eason-刘雨生-简历.docx">简历 <span aria-hidden="true">↓</span></a>
+        <button class="theme-toggle js-only" type="button" aria-label="切换浅色 / 深色">
+          <svg class="icon icon-sun" aria-hidden="true"><use href="#icon-sun"/></svg>
+          <svg class="icon icon-moon" aria-hidden="true"><use href="#icon-moon"/></svg>
+        </button>
+        <a class="bar-cta" href="#contact">聊聊 <span aria-hidden="true">→</span></a>
+        <!-- Narrow screens: the same links behind a native disclosure, which also works without JavaScript. -->
+        <details class="menu">
+          <summary class="menu-toggle"><span class="when-closed">菜单</span><span class="when-open">关闭</span></summary>
+          <div class="menu-panel">
+            <nav aria-label="章节导航（菜单）" data-nav>
+              <a href="#work">项目案例<sup aria-hidden="true">3</sup></a>
+              <a href="#approach">关于我</a>
+              <a href="#about">教育与实习经历</a>
+              <a href="#playground">Agent 实验室</a>
+              <a href="#contact">联系我</a>
+            </nav>
+            <div class="menu-extra">
+              <a href="resume.docx" download="Eason-刘雨生-简历.docx">下载简历 <span aria-hidden="true">↓</span></a>
+              <a href="mailto:liuyusheng_ai@163.com" data-mail>liuyusheng_ai@163.com</a>
+            </div>
+          </div>
+        </details>
+      </div>
     </div>
-    <nav class="topbar-nav" aria-label="章节导航（顶部栏）" data-nav>
-      <a href="#approach">介绍</a>
-      <a href="#work">项目</a>
-      <a href="#about">经历</a>
-      <a href="#playground">实验室</a>
-      <a href="#contact">联系</a>
-    </nav>
-  </div>
+  </header>
 
-  <div class="layout" id="top">
-    <!-- ============ Identity column (sticky on desktop) ============ -->
-    <header class="intro">
-      <div class="intro-main">
-        <p class="status"><span class="pulse" aria-hidden="true"></span>2027 届 · 正在寻找 AI Agent 相关机会</p>
-        <h1 class="name"><span class="name-en" lang="en">Eason</span> <span class="name-cn">刘雨生</span></h1>
-        <p class="role">AI Agent / 大模型应用开发</p>
-        <p class="pitch">把需求聊清楚，<br><em>让 AI 真正落地。</em></p>
-        <p class="intro-lead">专注知识检索、多智能体协作与后端工程。从理解业务开始，把想法做成有来源、有边界、可验证的系统。</p>
+  <main id="content" tabindex="-1">
+    <!-- ============ Hero — a poster that scrolls away ============
+         DOM order is name → pitch → facts (how it reads aloud); the grid places the name at the bottom. -->
+    <section class="hero" id="home" aria-labelledby="hero-name">
+      <div class="wrap hero-grid">
+        <h1 class="wordmark" id="hero-name"><span lang="en">Eason</span> <span class="wordmark-cn">刘雨生</span></h1>
+        <p class="corner corner-tl">AI Agent / 大模型应用开发</p>
+        <p class="corner corner-tr"><span class="pulse" aria-hidden="true"></span>2027 届 · 正在寻找 AI Agent 相关机会</p>
+        <div class="hero-main">
+          <p class="hero-title">把需求聊清楚，<br><em>让 AI 真正落地。</em></p>
+          <p class="hero-lead">专注知识检索、多智能体协作与后端工程。从理解业务开始，把想法做成有来源、有边界、可验证的系统。</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#work">查看项目案例 <span aria-hidden="true">→</span></a>
+            <a class="btn btn-quiet" href="#approach">完整了解我 <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+        <p class="corner corner-bl">北京建筑大学 · 人工智能 · 专业前 10%</p>
+        <p class="corner corner-br"><span aria-hidden="true">↓</span> 3 个项目 · 2 段实习</p>
+      </div>
+    </section>
 
-        <nav class="index-nav" aria-label="章节导航" data-nav>
-          <a href="#approach"><span class="idx">01</span><span class="bar" aria-hidden="true"></span>完整介绍</a>
-          <a href="#work"><span class="idx">02</span><span class="bar" aria-hidden="true"></span>项目案例</a>
-          <a href="#about"><span class="idx">03</span><span class="bar" aria-hidden="true"></span>教育与实习经历</a>
-          <a href="#playground"><span class="idx">04</span><span class="bar" aria-hidden="true"></span>Agent 实验室</a>
-          <a href="#contact"><span class="idx">05</span><span class="bar" aria-hidden="true"></span>联系我</a>
-        </nav>
+    <!-- ============ 01 项目案例 ============
+         Section ids are kept from earlier versions so links people already shared keep working:
+         #work = 项目案例, #approach = 关于我（原“完整介绍”）, #about = 教育与实习经历, #playground = 实验室. -->
+    <section class="chapter chapter-work" id="work" aria-labelledby="work-title">
+      <div class="wrap">
+        <h2 class="label" id="work-title"><span>01</span>项目案例 · 3</h2>
+
+        <ol class="index hover-group" aria-label="项目索引">
+          <li>
+            <a class="index-row" href="#case-rag">
+              <span class="index-num" aria-hidden="true">01</span>
+              <span class="index-main">
+                <span class="index-title">肉牛养殖<wbr>智能辅助系统</span>
+                <span class="index-meta">行业应用 · 海南君威 · 2026.04 — 至今</span>
+                <span class="index-flow">资料加工 → 切片入库 → 检索与 Skill → 权限与护栏 → 评测交付</span>
+              </span>
+              <span class="index-figure">98.3%<small>真实模型评测通过率</small></span>
+            </a>
+          </li>
+          <li>
+            <a class="index-row" href="#case-research">
+              <span class="index-num" aria-hidden="true">02</span>
+              <span class="index-main">
+                <span class="index-title">多角色<wbr>行业研究<wbr>与报告生成 Agent</span>
+                <span class="index-meta">个人项目 · 2026.07</span>
+                <span class="index-flow">Planner → Researcher → 无来源拦截 → Writer → 指标评估</span>
+              </span>
+              <span class="index-figure">3<small>协作角色</small></span>
+            </a>
+          </li>
+          <li>
+            <a class="index-row" href="#case-sql">
+              <span class="index-num" aria-hidden="true">03</span>
+              <span class="index-main">
+                <span class="index-title">自然语言<wbr>数据分析 Agent</span>
+                <span class="index-meta">个人项目 · 2026.07</span>
+                <span class="index-flow">问题理解 → Schema 检索 → SQL 生成 → 安全校验 → 查询执行 → 结果解释</span>
+              </span>
+              <span class="index-figure">14<small>类拦截关键字</small></span>
+            </a>
+          </li>
+        </ol>
+
+        <p class="chapter-intro"><strong>三个项目，三种工程实践。</strong>一段行业应用，与两个个人项目。每个案例都写明了问题、个人实现与验证范围。</p>
+
+        <div class="cases">
+          <!-- Case 01 -->
+          <article class="case" id="case-rag" aria-labelledby="case-rag-title">
+            <header class="case-head">
+              <p class="case-num"><span>01</span> / 03</p>
+              <h3 id="case-rag-title">肉牛养殖<wbr>智能辅助系统</h3>
+              <p class="case-meta">行业应用 · 海南君威 · <time datetime="2026-04">2026.04</time> — 至今</p>
+              <ul class="tags" aria-label="技术栈"><li>Django / DRF</li><li>Vue 3</li><li>ChromaDB</li><li>Ollama</li><li>ReAct</li><li>Docker</li></ul>
+            </header>
+            <div class="case-body">
+              <p class="case-lead">把分散的养殖资料和业务数据，变成有依据、有权限边界的问答入口。</p>
+              <ol class="flow" aria-label="系统链路"><li>资料加工</li><li>切片入库</li><li>检索与 Skill</li><li>权限与护栏</li><li>评测交付</li></ol>
+              <ul class="metrics">
+                <li><strong>444</strong><span>内置资料份数</span></li>
+                <li><strong>98.3%</strong><span>真实模型<wbr>评测通过率</span></li>
+                <li><strong>1400+</strong><span>后端自动化测试</span></li>
+              </ul>
+              <dl class="facts">
+                <div><dt>问题</dt><dd>资料分散且不少是扫描版书籍，回答需要保留依据；财务等敏感数据还要按岗位控制谁能看到。</dd></div>
+                <div><dt>做法</dt><dd>从 0 到 1 独立完成设计、开发与交付：搭建 OCR 到入库的加工管线，内置资料扩充至 444 份；基于 ReAct + Skill 路由实现疾病初筛、牛场汇报、财务问答等场景。</dd></div>
+                <div><dt>验证</dt><dd>12 套近 400 条评测集（含 40 条盲测）；真实模型评测任务完成 60/60、高风险拦截 22/22、整体通过率 98.3%；1400+ 项后端与 180+ 项前端自动化测试。</dd></div>
+              </dl>
+              <details class="case-detail" id="case-rag-detail">
+                <summary><span class="when-closed">完整技术细节</span><span class="when-open">收起技术细节</span><i class="plus" aria-hidden="true"></i></summary>
+                <div class="detail-body">
+                  <section><h4>知识如何进入系统</h4><p>搭建扫描版养殖书籍加工管线（OCR → 结构适配 → 切片 → 分类 → 入库）。单书试点 65 页产出 146 个切片、132 个有效入库，重复导入 100% 识别跳过。兼容 PDF、Word、Excel、TXT、CSV，按段落累积 500 字切片并保留 50 字重叠。预计算索引随安装包分发，新机首次导入由约 15 分钟缩短至 1 分钟内。</p></section>
+                  <section><h4>Agent 与业务</h4><p>基于 ReAct + Skill 路由实现疾病初筛、病例卡、单头牛查询、牛场汇报、财务问答等场景；对接业务平台只读接口，3 万+ 条牛只档案按状态聚合统计；加入同音错字纠正与数字核对护栏，无法在统计结果里找到的数字整句删除。</p></section>
+                  <section><h4>安全与权限</h4><p>财务数据按岗位三级授权，金额由程序计算、模型只做解释，全程留审计；构建 19 类套话问法 × 多岗位的攻防题库，任一金额泄露即判失败；回答来源按角色与资料归属实时过滤；财务提问每小时限 30 次，小样本汇总取整防反推单价。</p></section>
+                  <section><h4>评测与交付</h4><p>建立 12 套近 400 条 Agentic / Skill 评测集，含 40 条盲测。完成 Docker（PostgreSQL / Redis / Celery / Nginx）部署与 Redis 并发闸门，交付 Windows 桌面安装包及增量自动更新，更新包签名校验，GitHub Actions 自动构建发布。</p></section>
+                </div>
+              </details>
+              <p class="case-note">评测口径：60/60、22/22 与 98.3% 来自真实模型评测集，不等同于线上实际使用效果。</p>
+            </div>
+          </article>
+
+          <!-- Case 02 -->
+          <article class="case" id="case-research" aria-labelledby="case-research-title">
+            <header class="case-head">
+              <p class="case-num"><span>02</span> / 03</p>
+              <h3 id="case-research-title">多角色<wbr>行业研究<wbr>与报告生成 Agent</h3>
+              <p class="case-meta">个人项目 · <time datetime="2026-07">2026.07</time></p>
+              <ul class="tags" aria-label="技术栈"><li>LangGraph</li><li>MCP</li><li>SQLite</li><li>Tavily</li><li>Local RAG</li></ul>
+            </header>
+            <div class="case-body">
+              <p class="case-lead">让规划、检索与报告生成衔接起来，并保留每一条证据。</p>
+              <ol class="flow" aria-label="系统链路"><li>Planner</li><li>Researcher</li><li>无来源拦截</li><li>Writer</li><li>指标评估</li></ol>
+              <ul class="metrics">
+                <li><strong>3</strong><span>协作角色</span></li>
+                <li><strong>3</strong><span>类检索工具</span></li>
+                <li><strong>6</strong><span>次默认调用预算</span></li>
+              </ul>
+              <dl class="facts">
+                <div><dt>问题</dt><dd>研究任务需要拆解、管理来源；工具失败或资料不足时要明确停下，避免无依据地生成报告。</dd></div>
+                <div><dt>做法</dt><dd>用 LangGraph 编排 Planner、Researcher、Writer；接入网页搜索、本地 RAG 与 MCP 3 类工具；实现调用预算、超时与重试、无来源停止生成和 SQLite 状态保存。</dd></div>
+                <div><dt>验证</dt><dd>从任务完成、工具调用成功率、引用覆盖率 3 个维度输出指标；自动化测试覆盖带来源报告、调用预算、无来源拦截、检查点恢复和评测口径。</dd></div>
+              </dl>
+              <details class="case-detail" id="case-research-detail">
+                <summary><span class="when-closed">完整技术细节</span><span class="when-open">收起技术细节</span><i class="plus" aria-hidden="true"></i></summary>
+                <div class="detail-body">
+                  <section><h4>工作流</h4><p>以 LangGraph 编排 3 个角色，用共享状态传递计划、证据和调用记录，按来源去重后生成带编号引用的报告。网页搜索（Tavily）、本地 RAG 与 MCP 统一输出证据结构，默认离线可运行，规划与写作模型可替换。</p></section>
+                  <section><h4>可靠性控制</h4><p>调用预算默认 6 次，支持超时与重试，没有来源时停止生成；逐次记录工具状态、耗时、结果数和异常，单个工具失败不影响其他工具继续检索。SQLite 保存运行状态与证据，已完成任务可按 run_id 恢复。基于官方 MCP Python SDK 实现 stdio 客户端。</p></section>
+                  <section><h4>评测与测试</h4><p>从任务完成、工具调用成功率、引用覆盖率 3 个维度输出 Agentic Eval 指标；自动化测试覆盖带来源报告、调用预算、无来源拦截、检查点恢复和评测口径。</p></section>
+                  <section><h4>项目归属</h4><p>个人项目，由本人独立开发，使用 Codex 与 Claude 辅助。</p></section>
+                </div>
+              </details>
+              <p class="case-note">验证范围：默认使用离线演示资料，结果不等同于真实联网研究或真实模型质量评测。</p>
+            </div>
+          </article>
+
+          <!-- Case 03 -->
+          <article class="case" id="case-sql" aria-labelledby="case-sql-title">
+            <header class="case-head">
+              <p class="case-num"><span>03</span> / 03</p>
+              <h3 id="case-sql-title">自然语言<wbr>数据分析 Agent</h3>
+              <p class="case-meta">个人项目 · <time datetime="2026-07">2026.07</time></p>
+              <ul class="tags" aria-label="技术栈"><li>FastAPI</li><li>LangGraph</li><li>SQLAlchemy</li><li>Plotly</li></ul>
+            </header>
+            <div class="case-body">
+              <p class="case-lead">把业务问题转成受约束的查询语句，再把结果讲清楚。</p>
+              <ol class="flow" aria-label="系统链路"><li>问题理解</li><li>Schema 检索</li><li>SQL 生成</li><li>安全校验</li><li>查询执行</li><li>结果解释</li></ol>
+              <ul class="metrics">
+                <li><strong>6</strong><span>LangGraph 节点</span></li>
+                <li><strong>14</strong><span>类拦截关键字</span></li>
+                <li><strong>200</strong><span>单次最多<wbr>返回行数</span></li>
+              </ul>
+              <dl class="facts">
+                <div><dt>问题</dt><dd>自然语言查询需要对齐数据结构，同时限制危险语句、过量返回和无限修复。</dd></div>
+                <div><dt>做法</dt><dd>实现 6 节点图，校验失败时经条件路由回到生成节点，修复次数设上限；服务端校验每条 SQL，不把提示词当作唯一防线。</dd></div>
+                <div><dt>验证</dt><dd>自动化测试覆盖正常分析、危险写操作、多语句注入、行数限制和查询历史记录。</dd></div>
+              </dl>
+              <details class="case-detail" id="case-sql-detail">
+                <summary><span class="when-closed">完整技术细节</span><span class="when-open">收起技术细节</span><i class="plus" aria-hidden="true"></i></summary>
+                <div class="detail-body">
+                  <section><h4>完整链路</h4><p>问题理解 → Schema 检索 → SQL 生成 → 安全校验 → 查询执行 → 结果解释。通过 FastAPI、SQLAlchemy 提供查询和历史记录接口，并生成 Plotly 兼容图表配置，支持受限自动修复。</p></section>
+                  <section><h4>安全边界</h4><p>服务端校验每条 SQL，仅允许单条 SELECT / WITH，过滤注释后拦截 INSERT、UPDATE、DELETE、DROP、PRAGMA、ATTACH 等 14 类关键字；单次最多返回 200 行，执行超时 3 秒。模型适配层可替换，生成结果都必须通过校验。</p></section>
+                  <section><h4>工程设计</h4><p>内置离线演示数据和规则版生成器，无需 API Key 即可运行；默认 SQLite，可通过 DATABASE_URL 接入其他数据库；查询历史保留问题、SQL、行数和执行状态，便于复核。</p></section>
+                  <section><h4>项目归属</h4><p>个人项目，由本人独立开发，使用 Codex 与 Claude 辅助。</p></section>
+                </div>
+              </details>
+              <p class="case-note">验证范围：测试基于离线演示数据和规则版生成器，不等同于真实大模型生成 SQL 的端到端表现。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 02 关于我 ============ -->
+    <section class="chapter-about" id="approach" aria-labelledby="approach-title">
+      <div class="band invert">
+        <div class="wrap">
+          <p class="label"><span>02</span>关于我</p>
+          <h2 class="statement" id="approach-title">比起“能跑起来”，<br><em>我更在意<wbr>系统有来源、有边界、可评测。</em></h2>
+        </div>
       </div>
 
-      <div class="intro-foot">
-        <div class="intro-actions">
-          <a class="btn btn-primary" href="resume.docx" download="Eason-刘雨生-简历.docx">下载简历 <span aria-hidden="true">↓</span></a>
-          <a class="btn btn-quiet" href="#work">查看项目案例 <span aria-hidden="true">→</span></a>
-        </div>
-        <div class="intro-links">
-          <a href="https://github.com/liuyusheng-ai" target="_blank" rel="me noopener noreferrer">GitHub <span aria-hidden="true">↗</span><span class="sr-only">（在新标签页打开）</span></a>
-          <a href="mailto:liuyusheng_ai@163.com" data-mail>liuyusheng_ai@163.com</a>
-          <button class="theme-toggle js-only" type="button" aria-label="切换浅色 / 深色">
-            <svg class="icon icon-sun" aria-hidden="true"><use href="#icon-sun"/></svg>
-            <svg class="icon icon-moon" aria-hidden="true"><use href="#icon-moon"/></svg>
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <main class="content" id="content" tabindex="-1">
-      <!-- ============ 01 完整介绍 ============
-           Section ids are kept from earlier versions so links people already shared keep working:
-           #approach = 完整介绍, #work = 项目案例, #about = 教育与实习经历, #playground = 实验室. -->
-      <section class="block" id="approach" aria-labelledby="approach-title">
-        <p class="block-label"><span>01</span>完整介绍</p>
-        <h2 id="approach-title">你好，我是 Eason，刘雨生。</h2>
-        <div class="prose">
+      <div class="wrap about">
+        <p class="about-hello">你好，我是 Eason，刘雨生。</p>
+        <div class="prose about-cols">
           <p>北京建筑大学人工智能专业本科在读，预计 2027 年毕业，专业成绩前 10%。目前专注 AI Agent 与大模型应用开发，在<strong>海南君威投资有限公司</strong>担任 AI 应用开发实习生，独立完成肉牛养殖智能辅助系统。</p>
-          <p>我的工作围绕 <strong>RAG 知识库、多角色 Agent、Text-to-SQL 和后端接口</strong>展开：数据处理、工作流编排、工具调用与工程验证。比起“能跑起来”，我更在意系统有来源、有边界、可评测——遇到空结果、工具失败或越权请求时，它也知道该如何停下。</p>
-          <p>合作时，我会先听懂使用场景，确认任务和边界，再把技术方案与取舍讲清楚；交付时附上来源、测试与可复现评测。</p>
+          <p>我的工作围绕 <strong>RAG 知识库、多角色 Agent、Text-to-SQL 和后端接口</strong>展开：数据处理、工作流编排、工具调用与工程验证。遇到空结果、工具失败或越权请求时，系统也要知道该如何停下。</p>
         </div>
 
         <ul class="stats" aria-label="经历概览">
           <li><strong>2<small>段</small></strong><span>实习经历</span></li>
           <li><strong>3<small>个</small></strong><span>Agent 项目</span></li>
-          <li><strong>1400<small>+项</small></strong><span>肉牛项目后端测试</span></li>
-          <li><strong>1<small>万+</small></strong><span>数据产品记录治理</span></li>
+          <li><strong>1400<small>+项</small></strong><span>肉牛项目<wbr>后端测试</span></li>
+          <li><strong>1<small>万+</small></strong><span>数据产品<wbr>记录治理</span></li>
         </ul>
 
         <div class="method">
@@ -156,6 +316,7 @@
         <div class="brief" id="brief">
           <div class="brief-head">
             <h3 class="sub-title">合作从提问开始</h3>
+            <p>合作时，我会先听懂使用场景，确认任务和边界，再把技术方案与取舍讲清楚；交付时附上来源、测试与可复现评测。</p>
             <p class="js-only">选一个常见需求，看看我会先和你确认什么。</p>
           </div>
           <div class="brief-options js-only" role="group" aria-label="选择业务问题">
@@ -173,108 +334,24 @@
             <p class="brief-route">对应实践 <a class="text-link" id="brief-link" href="#case-rag">肉牛养殖智能辅助系统 <span aria-hidden="true">→</span></a></p>
           </div>
         </div>
-      </section>
 
-      <!-- ============ 02 项目案例 ============ -->
-      <section class="block" id="work" aria-labelledby="work-title">
-        <p class="block-label"><span>02</span>项目案例</p>
-        <h2 id="work-title">三个项目，三种工程实践。</h2>
-        <p class="block-lead">一段行业应用，与两个个人项目。每个案例都写明了问题、个人实现与验证范围。</p>
-
-        <div class="cases hover-group">
-          <!-- Case 01 -->
-          <article class="case" id="case-rag" aria-labelledby="case-rag-title">
-            <p class="case-top"><span class="num">01</span><span>行业应用 · 海南君威 · <time datetime="2026-04">2026.04</time> — 至今</span></p>
-            <h3 id="case-rag-title">肉牛养殖智能辅助系统</h3>
-            <p class="case-lead">把分散的养殖资料和业务数据，变成有依据、有权限边界的问答入口。</p>
-            <ol class="flow" aria-label="系统链路"><li>资料加工</li><li>切片入库</li><li>检索与 Skill</li><li>权限与护栏</li><li>评测交付</li></ol>
-            <dl class="facts">
-              <div><dt>问题</dt><dd>资料分散且不少是扫描版书籍，回答需要保留依据；财务等敏感数据还要按岗位控制谁能看到。</dd></div>
-              <div><dt>做法</dt><dd>从 0 到 1 独立完成设计、开发与交付：搭建 OCR 到入库的加工管线，内置资料扩充至 444 份；基于 ReAct + Skill 路由实现疾病初筛、牛场汇报、财务问答等场景。</dd></div>
-              <div><dt>验证</dt><dd>12 套近 400 条评测集（含 40 条盲测）；真实模型评测任务完成 60/60、高风险拦截 22/22、整体通过率 98.3%；1400+ 项后端与 180+ 项前端自动化测试。</dd></div>
-            </dl>
-            <ul class="metrics">
-              <li><strong>444</strong><span>内置资料份数</span></li>
-              <li><strong>98.3%</strong><span>真实模型评测通过率</span></li>
-              <li><strong>1400+</strong><span>后端自动化测试</span></li>
-            </ul>
-            <ul class="tags" aria-label="技术栈"><li>Django / DRF</li><li>Vue 3</li><li>ChromaDB</li><li>Ollama</li><li>ReAct</li><li>Docker</li></ul>
-            <details class="case-detail" id="case-rag-detail">
-              <summary><span class="when-closed">完整技术细节</span><span class="when-open">收起技术细节</span><i class="plus" aria-hidden="true"></i></summary>
-              <div class="detail-body">
-                <section><h4>知识如何进入系统</h4><p>搭建扫描版养殖书籍加工管线（OCR → 结构适配 → 切片 → 分类 → 入库）。单书试点 65 页产出 146 个切片、132 个有效入库，重复导入 100% 识别跳过。兼容 PDF、Word、Excel、TXT、CSV，按段落累积 500 字切片并保留 50 字重叠。预计算索引随安装包分发，新机首次导入由约 15 分钟缩短至 1 分钟内。</p></section>
-                <section><h4>Agent 与业务</h4><p>基于 ReAct + Skill 路由实现疾病初筛、病例卡、单头牛查询、牛场汇报、财务问答等场景；对接业务平台只读接口，3 万+ 条牛只档案按状态聚合统计；加入同音错字纠正与数字核对护栏，无法在统计结果里找到的数字整句删除。</p></section>
-                <section><h4>安全与权限</h4><p>财务数据按岗位三级授权，金额由程序计算、模型只做解释，全程留审计；构建 19 类套话问法 × 多岗位的攻防题库，任一金额泄露即判失败；回答来源按角色与资料归属实时过滤；财务提问每小时限 30 次，小样本汇总取整防反推单价。</p></section>
-                <section><h4>评测与交付</h4><p>建立 12 套近 400 条 Agentic / Skill 评测集，含 40 条盲测。完成 Docker（PostgreSQL / Redis / Celery / Nginx）部署与 Redis 并发闸门，交付 Windows 桌面安装包及增量自动更新，更新包签名校验，GitHub Actions 自动构建发布。</p></section>
-              </div>
-            </details>
-            <p class="case-note">评测口径：60/60、22/22 与 98.3% 来自真实模型评测集，不等同于线上实际使用效果。</p>
-          </article>
-
-          <!-- Case 02 -->
-          <article class="case" id="case-research" aria-labelledby="case-research-title">
-            <p class="case-top"><span class="num">02</span><span>个人项目 · <time datetime="2026-07">2026.07</time></span></p>
-            <h3 id="case-research-title">多角色行业研究与报告生成 Agent</h3>
-            <p class="case-lead">让规划、检索与报告生成衔接起来，并保留每一条证据。</p>
-            <ol class="flow" aria-label="系统链路"><li>Planner</li><li>Researcher</li><li>无来源拦截</li><li>Writer</li><li>指标评估</li></ol>
-            <dl class="facts">
-              <div><dt>问题</dt><dd>研究任务需要拆解、管理来源；工具失败或资料不足时要明确停下，避免无依据地生成报告。</dd></div>
-              <div><dt>做法</dt><dd>用 LangGraph 编排 Planner、Researcher、Writer；接入网页搜索、本地 RAG 与 MCP 3 类工具；实现调用预算、超时与重试、无来源停止生成和 SQLite 状态保存。</dd></div>
-              <div><dt>验证</dt><dd>从任务完成、工具调用成功率、引用覆盖率 3 个维度输出指标；自动化测试覆盖带来源报告、调用预算、无来源拦截、检查点恢复和评测口径。</dd></div>
-            </dl>
-            <ul class="metrics">
-              <li><strong>3</strong><span>协作角色</span></li>
-              <li><strong>3</strong><span>类检索工具</span></li>
-              <li><strong>6</strong><span>次默认调用预算</span></li>
-            </ul>
-            <ul class="tags" aria-label="技术栈"><li>LangGraph</li><li>MCP</li><li>SQLite</li><li>Tavily</li><li>Local RAG</li></ul>
-            <details class="case-detail" id="case-research-detail">
-              <summary><span class="when-closed">完整技术细节</span><span class="when-open">收起技术细节</span><i class="plus" aria-hidden="true"></i></summary>
-              <div class="detail-body">
-                <section><h4>工作流</h4><p>以 LangGraph 编排 3 个角色，用共享状态传递计划、证据和调用记录，按来源去重后生成带编号引用的报告。网页搜索（Tavily）、本地 RAG 与 MCP 统一输出证据结构，默认离线可运行，规划与写作模型可替换。</p></section>
-                <section><h4>可靠性控制</h4><p>调用预算默认 6 次，支持超时与重试，没有来源时停止生成；逐次记录工具状态、耗时、结果数和异常，单个工具失败不影响其他工具继续检索。SQLite 保存运行状态与证据，已完成任务可按 run_id 恢复。基于官方 MCP Python SDK 实现 stdio 客户端。</p></section>
-                <section><h4>评测与测试</h4><p>从任务完成、工具调用成功率、引用覆盖率 3 个维度输出 Agentic Eval 指标；自动化测试覆盖带来源报告、调用预算、无来源拦截、检查点恢复和评测口径。</p></section>
-                <section><h4>项目归属</h4><p>个人项目，由本人独立开发，使用 Codex 与 Claude 辅助。</p></section>
-              </div>
-            </details>
-            <p class="case-note">验证范围：默认使用离线演示资料，结果不等同于真实联网研究或真实模型质量评测。</p>
-          </article>
-
-          <!-- Case 03 -->
-          <article class="case" id="case-sql" aria-labelledby="case-sql-title">
-            <p class="case-top"><span class="num">03</span><span>个人项目 · <time datetime="2026-07">2026.07</time></span></p>
-            <h3 id="case-sql-title">自然语言数据分析 Agent</h3>
-            <p class="case-lead">把业务问题转成受约束的查询语句，再把结果讲清楚。</p>
-            <ol class="flow" aria-label="系统链路"><li>问题理解</li><li>Schema 检索</li><li>SQL 生成</li><li>安全校验</li><li>查询执行</li><li>结果解释</li></ol>
-            <dl class="facts">
-              <div><dt>问题</dt><dd>自然语言查询需要对齐数据结构，同时限制危险语句、过量返回和无限修复。</dd></div>
-              <div><dt>做法</dt><dd>实现 6 节点图，校验失败时经条件路由回到生成节点，修复次数设上限；服务端校验每条 SQL，不把提示词当作唯一防线。</dd></div>
-              <div><dt>验证</dt><dd>自动化测试覆盖正常分析、危险写操作、多语句注入、行数限制和查询历史记录。</dd></div>
-            </dl>
-            <ul class="metrics">
-              <li><strong>6</strong><span>LangGraph 节点</span></li>
-              <li><strong>14</strong><span>类拦截关键字</span></li>
-              <li><strong>200</strong><span>单次最多返回行数</span></li>
-            </ul>
-            <ul class="tags" aria-label="技术栈"><li>FastAPI</li><li>LangGraph</li><li>SQLAlchemy</li><li>Plotly</li></ul>
-            <details class="case-detail" id="case-sql-detail">
-              <summary><span class="when-closed">完整技术细节</span><span class="when-open">收起技术细节</span><i class="plus" aria-hidden="true"></i></summary>
-              <div class="detail-body">
-                <section><h4>完整链路</h4><p>问题理解 → Schema 检索 → SQL 生成 → 安全校验 → 查询执行 → 结果解释。通过 FastAPI、SQLAlchemy 提供查询和历史记录接口，并生成 Plotly 兼容图表配置，支持受限自动修复。</p></section>
-                <section><h4>安全边界</h4><p>服务端校验每条 SQL，仅允许单条 SELECT / WITH，过滤注释后拦截 INSERT、UPDATE、DELETE、DROP、PRAGMA、ATTACH 等 14 类关键字；单次最多返回 200 行，执行超时 3 秒。模型适配层可替换，生成结果都必须通过校验。</p></section>
-                <section><h4>工程设计</h4><p>内置离线演示数据和规则版生成器，无需 API Key 即可运行；默认 SQLite，可通过 DATABASE_URL 接入其他数据库；查询历史保留问题、SQL、行数和执行状态，便于复核。</p></section>
-                <section><h4>项目归属</h4><p>个人项目，由本人独立开发，使用 Codex 与 Claude 辅助。</p></section>
-              </div>
-            </details>
-            <p class="case-note">验证范围：测试基于离线演示数据和规则版生成器，不等同于真实大模型生成 SQL 的端到端表现。</p>
-          </article>
+        <div class="faq" id="faq">
+          <h3 class="sub-title">开口前，你可能想问</h3>
+          <dl>
+            <div><dt>什么时候毕业？</dt><dd>预计 2027 年 6 月，北京建筑大学人工智能专业本科。</dd></div>
+            <div><dt>想找什么方向？</dt><dd>AI Agent / 大模型应用开发。</dd></div>
+            <div><dt>项目里哪些是你自己做的？</dt><dd>肉牛养殖智能辅助系统由我从 0 到 1 独立完成设计、开发与交付；多角色研究 Agent 与 Text-to-SQL Agent 是个人项目，由我独立开发，使用 Codex 与 Claude 辅助。</dd></div>
+            <div><dt>案例里的数字怎么来的？</dt><dd>每个案例底部都写明了评测口径：哪些来自真实模型评测集，哪些来自离线演示数据。页面下方的 Agent 实验室是本地预设演示，不调用模型。</dd></div>
+          </dl>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ============ 03 经历 ============ -->
-      <section class="block" id="about" aria-labelledby="about-title">
-        <p class="block-label"><span>03</span>教育与实习经历</p>
-        <h2 id="about-title">能把技术讲清楚，也能把事情做完。</h2>
+    <!-- ============ 03 经历 ============ -->
+    <section class="chapter" id="about" aria-labelledby="about-title">
+      <div class="wrap">
+        <p class="label"><span>03</span>教育与实习经历</p>
+        <h2 class="chapter-title" id="about-title">能把技术讲清楚，也能把事情做完。</h2>
 
         <ol class="timeline hover-group">
           <li class="job">
@@ -326,13 +403,15 @@
           </dl>
         </div>
         <a class="text-link resume-link" href="resume.docx" download="Eason-刘雨生-简历.docx">下载完整简历（Word） <span aria-hidden="true">↓</span></a>
-      </section>
+      </div>
+    </section>
 
-      <!-- ============ 04 Agent 实验室 ============ -->
-      <section class="block" id="playground" aria-labelledby="lab-title">
-        <p class="block-label"><span>04</span>Agent 实验室</p>
-        <h2 id="lab-title">别只看介绍，亲手运行一次。</h2>
-        <p class="block-lead">给系统一个任务，观察规划、检索、执行与安全退出。这是本地预设演示：不调用模型，不连接数据库，也不采集任何输入。</p>
+    <!-- ============ 04 Agent 实验室 ============ -->
+    <section class="chapter band invert" id="playground" aria-labelledby="lab-title">
+      <div class="wrap">
+        <p class="label"><span>04</span>Agent 实验室</p>
+        <h2 class="chapter-title" id="lab-title">别只看介绍，亲手运行一次。</h2>
+        <p class="chapter-lead">给系统一个任务，观察规划、检索、执行与安全退出。这是本地预设演示：不调用模型，不连接数据库，也不采集任何输入。</p>
 
         <div class="terminal">
           <div class="term-bar">
@@ -367,13 +446,21 @@
             <button type="button" class="term-btn" id="term-reset">重置 <span aria-hidden="true">↺</span></button>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ============ 05 联系 ============ -->
-      <section class="block contact" id="contact" aria-labelledby="contact-title">
-        <p class="block-label"><span>05</span>联系我</p>
+    <!-- ============ 05 联系 ============ -->
+    <section class="chapter contact" id="contact" aria-labelledby="contact-title">
+      <div class="wrap">
+        <p class="label"><span>05</span>联系我</p>
         <h2 class="contact-title" id="contact-title">一起聊聊<br><em>具体的项目。</em></h2>
-        <p class="block-lead">招聘、项目合作或技术交流，欢迎直接联系。</p>
+        <p class="chapter-lead">招聘、项目合作或技术交流，欢迎直接联系。</p>
+
+        <p class="contact-mail">
+          <a href="mailto:liuyusheng_ai@163.com" data-mail>liuyusheng_ai@163.com</a>
+          <button type="button" class="copy-btn js-only" id="copy-email">复制</button>
+          <span class="sr-only" id="copy-status" role="status"></span>
+        </p>
 
         <div class="intents js-only" role="group" aria-label="选择联系主题">
           <button class="chip" type="button" data-intent="招聘交流" aria-pressed="false">我在寻找 AI 开发者</button>
@@ -383,23 +470,19 @@
         <p class="intent-note js-only" id="intent-note" role="status">选择主题后，邮件链接会带上对应标题；不会自动发送任何内容。</p>
 
         <ul class="contact-list">
-          <li>
-            <span class="contact-key">邮箱</span>
-            <a href="mailto:liuyusheng_ai@163.com" data-mail>liuyusheng_ai@163.com</a>
-            <button type="button" class="copy-btn js-only" id="copy-email">复制</button>
-            <span class="sr-only" id="copy-status" role="status"></span>
-          </li>
           <li><span class="contact-key">电话</span><a href="tel:+8615893558838">158 9355 8838</a></li>
           <li><span class="contact-key">GitHub</span><a href="https://github.com/liuyusheng-ai" target="_blank" rel="me noopener noreferrer">github.com/liuyusheng-ai <span aria-hidden="true">↗</span><span class="sr-only">（在新标签页打开）</span></a></li>
           <li><span class="contact-key">简历</span><a href="resume.docx" download="Eason-刘雨生-简历.docx">下载完整简历 <span aria-hidden="true">↓</span></a></li>
         </ul>
-      </section>
+      </div>
+    </section>
+  </main>
 
-      <footer class="colophon">
-        <p>纯手写 HTML、CSS 与 JavaScript，托管于 GitHub Pages。英文字体为 Instrument Serif 与 JetBrains Mono。</p>
-        <p>内容依据个人简历整理；实验室为本地预设演示。© 2026 Eason 刘雨生</p>
-      </footer>
-    </main>
-  </div>
+  <footer class="colophon">
+    <div class="wrap">
+      <p>纯手写 HTML、CSS 与 JavaScript，托管于 GitHub Pages。英文字体为 Instrument Serif 与 JetBrains Mono。</p>
+      <p>内容依据个人简历整理；实验室为本地预设演示。© 2026 Eason 刘雨生</p>
+    </div>
+  </footer>
 </body>
 </html>

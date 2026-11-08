@@ -178,8 +178,13 @@ def check_contrast(css):
     print('contrast (WCAG AA)')
 
     def tokens(selector):
-        block = re.search(re.escape(selector) + r'\s*\{(.*?)\n\}', css, re.S).group(1)
-        return dict(re.findall(r'--([\w-]+):\s*(#[0-9a-fA-F]{6})', block))
+        # Token blocks may list several selectors (e.g. `:root, :root[data-theme="light"] .invert`):
+        # use the first block whose selector list names `selector` and that defines --bg.
+        for selectors, body in re.findall(r'([^{}]+)\{([^{}]*)\}', re.sub(r'/\*.*?\*/', '', css, flags=re.S)):
+            names = [name.strip() for name in selectors.split(',')]
+            if selector in names and '--bg:' in body:
+                return dict(re.findall(r'--([\w-]+):\s*(#[0-9a-fA-F]{6})', body))
+        raise SystemExit(f'check.py: no token block for {selector} in styles.css')
 
     dark = tokens(':root')
     themes = {'dark': dark, 'light': {**dark, **tokens(':root[data-theme="light"]')}}

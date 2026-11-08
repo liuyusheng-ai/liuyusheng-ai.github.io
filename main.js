@@ -103,31 +103,27 @@
     sync();
   }
 
-  /* ---------- Cursor glow, desktop pointers only ---------- */
-  function initSpotlight() {
-    if (reduceMotion.matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    const spot = $('.spotlight');
-    let frame = 0, x = 0, y = 0;
-    addEventListener('pointermove', event => {
-      x = event.clientX; y = event.clientY;
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        spot.style.setProperty('--x', `${x}px`);
-        spot.style.setProperty('--y', `${y}px`);
-      });
-    }, { passive: true });
+  /* ---------- Bar: a hairline appears once the page moves (the frosted backdrop is CSS-only) ---------- */
+  function initBar() {
+    const bar = $('.bar');
+    if (!('IntersectionObserver' in window)) { bar.classList.add('is-scrolled'); return; }
+    // A sentinel at the very top of the page; once it leaves the viewport, the page has scrolled.
+    const sentinel = document.createElement('div');
+    sentinel.className = 'bar-sentinel';
+    sentinel.setAttribute('aria-hidden', 'true');
+    document.body.prepend(sentinel);
+    new IntersectionObserver(([entry]) => bar.classList.toggle('is-scrolled', !entry.isIntersecting)).observe(sentinel);
   }
 
-  /* ---------- Section nav: highlight the chapter being read (both navs) ----------
+  /* ---------- Section nav: highlight the chapter being read (bar and menu) ----------
      Observers instead of a scroll handler: no layout reads while scrolling. */
   function initNavigation() {
-    const links = $$('[data-nav] a');
+    const links = $$('[data-nav] a[href^="#"]');
     const ids = [...new Set(links.map(link => link.hash.slice(1)))];
-    const topbarNav = $('.topbar-nav');
+    const order = ['home', ...ids]; // the first screen counts too: while it is in view, nothing is lit
     const crossing = new Set();
     let atEnd = false;
-    let active = '';
+    let active = null;
 
     function setActive(id) {
       if (id === active) return;
@@ -136,26 +132,39 @@
         if (link.hash === `#${active}`) link.setAttribute('aria-current', 'location');
         else link.removeAttribute('aria-current');
       });
-      // On narrow screens the top bar scrolls sideways; keep the active link in view.
-      const mobileLink = $(`a[href="#${active}"]`, topbarNav);
-      if (mobileLink && topbarNav.scrollWidth > topbarNav.clientWidth) {
-        topbarNav.scrollTo({ left: mobileLink.offsetLeft - (topbarNav.clientWidth - mobileLink.offsetWidth) / 2, behavior: 'smooth' });
-      }
     }
 
-    // Between sections nothing crosses the band, so the last active chapter stays lit.
-    const pick = () => setActive(atEnd ? ids[ids.length - 1] : ids.filter(id => crossing.has(id)).pop() || active || ids[0]);
+    // Between chapters nothing crosses the band, so the last lit chapter stays lit.
+    const pick = () => {
+      if (atEnd) return setActive(ids[ids.length - 1]);
+      const current = order.filter(id => crossing.has(id)).pop();
+      if (current) setActive(current === 'home' ? '' : current);
+    };
 
-    setActive(ids[0]);
+    setActive('');
     if (!('IntersectionObserver' in window)) return;
-    // A thin band 35% down the viewport: the section crossing it is the one being read.
+    // A thin band 35% down the viewport: the chapter crossing it is the one being read.
     const band = new IntersectionObserver(entries => {
       entries.forEach(entry => (entry.isIntersecting ? crossing.add(entry.target.id) : crossing.delete(entry.target.id)));
       pick();
     }, { rootMargin: '-35% 0px -64% 0px' });
-    ids.forEach(id => band.observe(document.getElementById(id)));
+    order.forEach(id => band.observe(document.getElementById(id)));
     // Reaching the footer means the last chapter is being read, even if it never reaches the band.
     new IntersectionObserver(([entry]) => { atEnd = entry.isIntersecting; pick(); }, { threshold: 1 }).observe($('.colophon'));
+  }
+
+  /* ---------- Narrow-screen menu: a native <details>; scripts only add the expected ways to close it ---------- */
+  function initMenu() {
+    const menu = $('.menu');
+    const toggle = $('summary', menu);
+    const close = ({ focus = false } = {}) => {
+      if (!menu.open) return;
+      menu.open = false;
+      if (focus) toggle.focus();
+    };
+    $$('a', menu).forEach(link => link.addEventListener('click', () => close()));
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') close({ focus: true }); });
+    document.addEventListener('click', event => { if (!menu.contains(event.target)) close(); });
   }
 
   /* ---------- Deep links open the <details> that holds the target ---------- */
@@ -169,6 +178,9 @@
     if (!target) return null;
     if (target.tagName === 'DETAILS') target.open = true;
     for (let parent = target.parentElement?.closest('details'); parent; parent = parent.parentElement?.closest('details')) parent.open = true;
+    // A target still waiting to scroll in is shifted by its entrance transform, which would skew
+    // where the jump lands; show it at once instead.
+    target.closest('.reveal')?.classList.remove('reveal', 'is-visible');
     return target;
   }
 
@@ -178,7 +190,14 @@
       const link = event.target.closest('a[href^="#"]');
       if (link && link.hash.length > 1) fromHash(link.hash);
     }, true);
-    addEventListener('hashchange', () => fromHash(location.hash));
+    addEventListener('hashchange', () => {
+      // Link clicks were prepared above. A hash typed into the address bar arrives here after the
+      // browser has already jumped, so if the target was still offset, jump again to land true.
+      const id = idFromHash(location.hash);
+      const wasOffset = Boolean(id && document.getElementById(id)?.closest('.reveal'));
+      const target = revealTarget(id);
+      if (target && wasOffset) target.scrollIntoView({ block: 'start' });
+    });
     if (location.hash.length > 1) {
       const target = fromHash(location.hash);
       // Arriving from a shared link: jump straight there rather than animating from the top.
@@ -359,6 +378,27 @@
     return copied;
   }
 
+  /* ---------- Case flows light up node by node ----------
+     Same fail-safe as the reveal: a flow is dimmed only after the observer confirms it is below the fold. */
+  function initFlows() {
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) return;
+    const reported = new WeakSet();
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      const flow = entry.target;
+      if (!reported.has(flow)) {
+        reported.add(flow);
+        const fold = entry.rootBounds ? entry.rootBounds.bottom : innerHeight;
+        if (!entry.isIntersecting && entry.boundingClientRect.top > fold) flow.classList.add('is-pending');
+        else observer.unobserve(flow);
+        return;
+      }
+      if (!entry.isIntersecting) return;
+      flow.classList.replace('is-pending', 'is-live');
+      observer.unobserve(flow);
+    }), { rootMargin: '0px 0px -12% 0px' });
+    $$('.case .flow').forEach(flow => observer.observe(flow));
+  }
+
   /* ---------- Gentle reveal for content below the fold ----------
      Fail-safe: an element is hidden only after the observer's first report confirms it is
      below the viewport. If observers never fire, nothing is ever hidden. */
@@ -380,11 +420,11 @@
       // Hand transitions back to the component (hover states) once the entrance finishes.
       setTimeout(() => element.classList.remove('reveal', 'is-visible'), 800);
     }), { rootMargin: '0px 0px -6% 0px' });
-    $$('.stats, .method, .brief, .case, .job, .skills, .terminal, .contact-list').forEach(element => observer.observe(element));
+    $$('.index, .case, .stats, .method, .brief, .faq, .job, .skills, .terminal, .contact-list').forEach(element => observer.observe(element));
   }
 
   // Each feature starts on its own: one failing (an old browser, a missing element) leaves the rest working.
-  [initTheme, initSpotlight, initNavigation, initDeepLinks, initBrief, initLab, initContact, initReveal].forEach(init => {
+  [initTheme, initBar, initNavigation, initMenu, initDeepLinks, initBrief, initLab, initContact, initFlows, initReveal].forEach(init => {
     try { init(); } catch (error) { console.error(`[site] ${init.name} failed:`, error); }
   });
 })();
