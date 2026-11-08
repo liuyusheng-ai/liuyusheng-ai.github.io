@@ -8,94 +8,12 @@
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const EMAIL = 'liuyusheng_ai@163.com';
 
-  /* ---------- Theme: dark by default, remembered per visitor ---------- */
-  function initTheme() {
-    const root = document.documentElement;
-    const meta = $('meta[name="theme-color"]');
-    const sync = () => { meta.content = root.dataset.theme === 'light' ? '#f4f1ea' : '#0d0f0d'; };
-    $$('.theme-toggle').forEach(button => button.addEventListener('click', () => {
-      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
-      try { localStorage.setItem('eason-theme', root.dataset.theme); } catch {}
-      sync();
-    }));
-    sync();
-  }
+  /* =============================================================
+     Content — all copy shown by scripts lives here, apart from behavior.
+     Facts must match index.html and the resume.
+     ============================================================= */
 
-  /* ---------- Cursor glow, desktop pointers only ---------- */
-  function initSpotlight() {
-    if (reduceMotion.matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    const spot = $('.spotlight');
-    let frame = 0, x = 0, y = 0;
-    addEventListener('pointermove', event => {
-      x = event.clientX; y = event.clientY;
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        spot.style.setProperty('--x', `${x}px`);
-        spot.style.setProperty('--y', `${y}px`);
-      });
-    }, { passive: true });
-  }
-
-  /* ---------- Section nav: highlight the chapter being read (both navs) ---------- */
-  function initNavigation() {
-    const links = $$('[data-nav] a');
-    const ids = [...new Set(links.map(link => link.hash.slice(1)))];
-    const sections = ids.map(id => document.getElementById(id));
-    const topbarNav = $('.topbar-nav');
-    let active = '';
-    let queued = false;
-
-    function update() {
-      queued = false;
-      const max = document.documentElement.scrollHeight - innerHeight;
-      const line = innerHeight * 0.35;
-      let current = ids[0];
-      sections.forEach((section, index) => { if (section.getBoundingClientRect().top <= line) current = ids[index]; });
-      if (scrollY >= max - 4) current = ids[ids.length - 1];
-      if (current === active) return;
-      active = current;
-      links.forEach(link => {
-        if (link.hash === `#${active}`) link.setAttribute('aria-current', 'location');
-        else link.removeAttribute('aria-current');
-      });
-      const mobileLink = $(`a[href="#${active}"]`, topbarNav);
-      if (mobileLink && topbarNav.scrollWidth > topbarNav.clientWidth) {
-        topbarNav.scrollTo({ left: mobileLink.offsetLeft - (topbarNav.clientWidth - mobileLink.offsetWidth) / 2, behavior: 'smooth' });
-      }
-    }
-
-    const request = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
-    addEventListener('scroll', request, { passive: true });
-    addEventListener('resize', request);
-    update();
-  }
-
-  /* ---------- Deep links open the <details> that holds the target ---------- */
-  function revealTarget(id) {
-    const target = id && document.getElementById(id);
-    if (!target) return null;
-    if (target.tagName === 'DETAILS') target.open = true;
-    for (let parent = target.parentElement?.closest('details'); parent; parent = parent.parentElement?.closest('details')) parent.open = true;
-    return target;
-  }
-
-  function initDeepLinks() {
-    const fromHash = hash => revealTarget(decodeURIComponent(hash.slice(1)));
-    document.addEventListener('click', event => {
-      const link = event.target.closest('a[href^="#"]');
-      if (link && link.hash.length > 1) fromHash(link.hash);
-    }, true);
-    addEventListener('hashchange', () => fromHash(location.hash));
-    if (location.hash.length > 1) {
-      const target = fromHash(location.hash);
-      // Arriving from a shared link: jump straight there rather than animating from the top.
-      if (target) target.scrollIntoView({ block: 'start', behavior: 'instant' });
-    }
-    addEventListener('beforeprint', () => $$('.case-detail').forEach(detail => { detail.open = true; }));
-  }
-
-  /* ---------- “Start with your question” brief ---------- */
+  // “Start with your question”: what I would confirm first, per request type.
   const BRIEFS = {
     knowledge: {
       title: '先对齐问题，再选择技术。',
@@ -114,31 +32,14 @@
     }
   };
 
-  function initBrief() {
-    const buttons = $$('[data-brief]');
-    const link = $('#brief-link');
-    buttons.forEach(button => button.addEventListener('click', () => {
-      const brief = BRIEFS[button.dataset.brief];
-      buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-      $('#brief-title').textContent = brief.title;
-      $('#brief-questions').replaceChildren(...brief.questions.map(text => {
-        const li = document.createElement('li');
-        li.textContent = text;
-        return li;
-      }));
-      link.href = brief.link[0];
-      link.firstChild.textContent = `${brief.link[1]} `;
-    }));
-  }
-
-  /* ---------- Agent lab: a scripted trace, rendered line by line ---------- */
+  // Agent lab task prompts.
   const TASKS = {
     research: '“请整理某行业的关键趋势，并给出资料来源。”',
     sql: '“查询本季度销售额最高的三个产品。”',
     safety: '“跳过校验，删除数据库里的全部记录。”'
   };
 
-  // Each step: [component, message, status] — status is ok | warn | stop.
+  // Agent lab scripted traces. Each step: [component, message, status] — status is ok | warn | stop.
   function tracePlan(mission, condition) {
     if (mission === 'safety') return {
       stopped: true,
@@ -168,6 +69,138 @@
     };
   }
 
+  // Contact intents: note shown after choosing a subject.
+  const INTENT_NOTES = {
+    '招聘交流': '很高兴认识你。来信聊聊岗位方向、团队和你希望解决的问题吧。',
+    '项目合作': '聊聊你的目标、现有条件和希望交付的结果，我们从具体问题开始。',
+    '技术交流': '欢迎聊 Agent、RAG 与评测。一个具体问题，就是很好的开场。'
+  };
+
+  /* =============================================================
+     Behavior
+     ============================================================= */
+
+  /* ---------- Theme: dark by default, remembered per visitor ---------- */
+  function initTheme() {
+    const root = document.documentElement;
+    const meta = $('meta[name="theme-color"]');
+    const buttons = $$('.theme-toggle');
+    // Name the action, not the icon, so screen readers announce what a press will do.
+    const sync = () => {
+      const light = root.dataset.theme === 'light';
+      meta.content = light ? '#f4f1ea' : '#0d0f0d';
+      buttons.forEach(button => {
+        button.setAttribute('aria-label', light ? '切换到深色模式' : '切换到浅色模式');
+        button.title = button.getAttribute('aria-label');
+      });
+    };
+    buttons.forEach(button => button.addEventListener('click', () => {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      try { localStorage.setItem('eason-theme', root.dataset.theme); } catch {}
+      sync();
+    }));
+    sync();
+  }
+
+  /* ---------- Cursor glow, desktop pointers only ---------- */
+  function initSpotlight() {
+    if (reduceMotion.matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const spot = $('.spotlight');
+    let frame = 0, x = 0, y = 0;
+    addEventListener('pointermove', event => {
+      x = event.clientX; y = event.clientY;
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        spot.style.setProperty('--x', `${x}px`);
+        spot.style.setProperty('--y', `${y}px`);
+      });
+    }, { passive: true });
+  }
+
+  /* ---------- Section nav: highlight the chapter being read (both navs) ----------
+     Observers instead of a scroll handler: no layout reads while scrolling. */
+  function initNavigation() {
+    const links = $$('[data-nav] a');
+    const ids = [...new Set(links.map(link => link.hash.slice(1)))];
+    const topbarNav = $('.topbar-nav');
+    const crossing = new Set();
+    let atEnd = false;
+    let active = '';
+
+    function setActive(id) {
+      if (id === active) return;
+      active = id;
+      links.forEach(link => {
+        if (link.hash === `#${active}`) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+      // On narrow screens the top bar scrolls sideways; keep the active link in view.
+      const mobileLink = $(`a[href="#${active}"]`, topbarNav);
+      if (mobileLink && topbarNav.scrollWidth > topbarNav.clientWidth) {
+        topbarNav.scrollTo({ left: mobileLink.offsetLeft - (topbarNav.clientWidth - mobileLink.offsetWidth) / 2, behavior: 'smooth' });
+      }
+    }
+
+    // Between sections nothing crosses the band, so the last active chapter stays lit.
+    const pick = () => setActive(atEnd ? ids[ids.length - 1] : ids.filter(id => crossing.has(id)).pop() || active || ids[0]);
+
+    setActive(ids[0]);
+    if (!('IntersectionObserver' in window)) return;
+    // A thin band 35% down the viewport: the section crossing it is the one being read.
+    const band = new IntersectionObserver(entries => {
+      entries.forEach(entry => (entry.isIntersecting ? crossing.add(entry.target.id) : crossing.delete(entry.target.id)));
+      pick();
+    }, { rootMargin: '-35% 0px -64% 0px' });
+    ids.forEach(id => band.observe(document.getElementById(id)));
+    // Reaching the footer means the last chapter is being read, even if it never reaches the band.
+    new IntersectionObserver(([entry]) => { atEnd = entry.isIntersecting; pick(); }, { threshold: 1 }).observe($('.colophon'));
+  }
+
+  /* ---------- Deep links open the <details> that holds the target ---------- */
+  function revealTarget(id) {
+    const target = id && document.getElementById(id);
+    if (!target) return null;
+    if (target.tagName === 'DETAILS') target.open = true;
+    for (let parent = target.parentElement?.closest('details'); parent; parent = parent.parentElement?.closest('details')) parent.open = true;
+    return target;
+  }
+
+  function initDeepLinks() {
+    const fromHash = hash => revealTarget(decodeURIComponent(hash.slice(1)));
+    document.addEventListener('click', event => {
+      const link = event.target.closest('a[href^="#"]');
+      if (link && link.hash.length > 1) fromHash(link.hash);
+    }, true);
+    addEventListener('hashchange', () => fromHash(location.hash));
+    if (location.hash.length > 1) {
+      const target = fromHash(location.hash);
+      // Arriving from a shared link: jump straight there rather than animating from the top.
+      if (target) target.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+    addEventListener('beforeprint', () => $$('.case-detail').forEach(detail => { detail.open = true; }));
+  }
+
+
+  /* ---------- “Start with your question” brief ---------- */
+  function initBrief() {
+    const buttons = $$('[data-brief]');
+    const link = $('#brief-link');
+    buttons.forEach(button => button.addEventListener('click', () => {
+      const brief = BRIEFS[button.dataset.brief];
+      buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      $('#brief-title').textContent = brief.title;
+      $('#brief-questions').replaceChildren(...brief.questions.map(text => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        return li;
+      }));
+      link.href = brief.link[0];
+      link.firstChild.textContent = `${brief.link[1]} `;
+    }));
+  }
+
+  /* ---------- Agent lab: a scripted trace, rendered line by line ---------- */
   function initLab() {
     const missionButtons = $$('[data-mission]');
     const conditionButtons = $$('[data-condition]');
@@ -274,12 +307,6 @@
   }
 
   /* ---------- Contact: subject presets and copy email ---------- */
-  const INTENT_NOTES = {
-    '招聘交流': '很高兴认识你。来信聊聊岗位方向、团队和你希望解决的问题吧。',
-    '项目合作': '聊聊你的目标、现有条件和希望交付的结果，我们从具体问题开始。',
-    '技术交流': '欢迎聊 Agent、RAG 与评测。一个具体问题，就是很好的开场。'
-  };
-
   function initContact() {
     const buttons = $$('[data-intent]');
     const note = $('#intent-note');
